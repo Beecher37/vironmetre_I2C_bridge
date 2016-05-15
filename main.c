@@ -1,4 +1,5 @@
 #include "mcc_generated_files/mcc.h"
+#include "i2c/i2c_helpers.h"
 
 void main(void)
 {
@@ -12,7 +13,7 @@ void main(void)
     {
         // Add your application code
         if(i++ == 0)
-            IO_RA0_Toggle();
+            EUSART_Write(I2C_FirstDevice());
         
         __delay_ms(1);
     }
