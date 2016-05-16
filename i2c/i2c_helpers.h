@@ -24,7 +24,7 @@ typedef struct
     uint16_t debounceCount;
 } SensorStatus_t;
 
-extern SensorStatus_t SensorState;
+extern SensorStatus_t sensorState;
 
 void Debounce(bool rawPinValue, bool* oldStableValue, uint16_t* debounceCount);
 

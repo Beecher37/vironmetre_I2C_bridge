@@ -3,7 +3,7 @@
 
 #define I2C_RETRY_MAX 5
 
-SensorStatus_t SensorState;
+SensorStatus_t sensorState;
 
 void Debounce(bool rawPinValue, bool* oldStableValue, uint16_t* debounceCount) {
     if (rawPinValue == *oldStableValue && *debounceCount > 0)
@@ -32,9 +32,9 @@ bool I2C_Operation(uint8_t dev_addr, uint8_t* p_buffer, uint8_t length,
         (*functionPtr)(p_buffer, length, dev_addr, &status);
 
         // wait for the message to be sent or status has changed.
-        while (status == I2C_MESSAGE_PENDING && SensorState.plugged);
+        while (status == I2C_MESSAGE_PENDING && sensorState.plugged);
 
-        if (!SensorState.plugged)
+        if (!sensorState.plugged)
             return false;
 
         if (status == I2C_MESSAGE_COMPLETE)
@@ -56,7 +56,7 @@ uint8_t I2C_FirstDevice() {
         if (I2C_ReadBytes(addr, &buffer, 1))
             return addr;
 
-        if (!SensorState.plugged)
+        if (!sensorState.plugged)
             break;
     }
 
