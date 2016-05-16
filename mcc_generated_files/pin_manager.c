@@ -45,6 +45,7 @@
 
 #include <xc.h>
 #include "pin_manager.h"
+#include "../i2c/i2c_helpers.h"
 
 void PIN_MANAGER_Initialize(void)
 {
@@ -63,12 +64,14 @@ void PIN_MANAGER_Initialize(void)
     // enable interrupt-on-change globally
     // enable interrupt-on-change globally    
     INTCONbits.RBIE = 1;   
+    INTCON2bits.INTEDG1 = 1;  
 }
 
 
 void PIN_MANAGER_IOC(void)
 {    
     // Please enable Interrupt-On-Change on at least one pin
+        
 }
 
 /**

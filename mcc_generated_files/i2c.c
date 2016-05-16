@@ -205,8 +205,8 @@ void I2C_Initialize(void)
 
     i2c_object.i2cErrors = 0;
 
-    // R_nW write_noTX; P stopbit_notdetected; S startbit_notdetected; BF RCinprocess_TXcomplete; SMP Standard Speed; UA dontupdate; CKE disabled; D_nA lastbyte_address; 
-    SSPSTAT = 0x80;
+    // R_nW write_noTX; P stopbit_notdetected; S startbit_notdetected; BF RCinprocess_TXcomplete; SMP High Speed; UA dontupdate; CKE disabled; D_nA lastbyte_address; 
+    SSPSTAT = 0x00;
     // SSPEN enabled; WCOL no_collision; CKP Idle:Low, Active:High; SSPM FOSC/4_SSPxADD_I2C; SSPOV no_overflow; 
     SSPCON1 = 0x28;
     // Baud Rate Generator Value: SSPADD 19;   

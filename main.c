@@ -1,20 +1,35 @@
 #include "mcc_generated_files/mcc.h"
 #include "i2c/i2c_helpers.h"
 
+#define INFO_I2C_PLUGGED 0x49
+
 void main(void)
 {
-    uint8_t i = 0;
- 
+    SensorStatus_t oldSensorState;
+    
     SYSTEM_Initialize();
     INTERRUPT_GlobalInterruptEnable();
     INTERRUPT_PeripheralInterruptEnable();
 
+    SensorState.debounceCount = 0;
+    oldSensorState.plugged = false;
+    
     while (1)
-    {
-        // Add your application code
-        if(i++ == 0)
-            EUSART_Write(I2C_FirstDevice());
+    {        
+        Debounce(!IO_RB1_GetValue(), &SensorState.plugged, &SensorState.debounceCount);
         
-        __delay_ms(1);
+        if(SensorState.plugged != oldSensorState.plugged)
+        {
+            EUSART_Write(INFO_I2C_PLUGGED);
+            EUSART_Write(SensorState.plugged);
+            
+            if(SensorState.plugged)
+            {
+                I2C_Initialize();
+                EUSART_Write(I2C_FirstDevice());
+            }
+        }
+        
+        oldSensorState = SensorState;
     }
 }
