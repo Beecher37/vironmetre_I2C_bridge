@@ -52,8 +52,8 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 /**
   Section: Macro Declarations
 */
-#define EUSART_TX_BUFFER_SIZE 8
-#define EUSART_RX_BUFFER_SIZE 8
+#define EUSART_TX_BUFFER_SIZE 32
+#define EUSART_RX_BUFFER_SIZE 32
 
 /**
   Section: Global Variables
@@ -68,6 +68,13 @@ static uint8_t eusartRxHead = 0;
 static uint8_t eusartRxTail = 0;
 static uint8_t eusartRxBuffer[EUSART_RX_BUFFER_SIZE];
 volatile uint8_t eusartRxCount;
+
+#define NB_COMMANDS             8
+
+static uint8_t commandsReceived[NB_COMMANDS][EUSART_RX_BUFFER_SIZE];
+bool newCmd = false;
+static uint8_t commandsHead = 0;
+static uint8_t commandsTail = 0;
 
 /**
   Section: EUSART APIs
@@ -90,10 +97,10 @@ void EUSART_Initialize(void)
     // TX9 8-bit; TX9D 0; SENDB sync_break_complete; TXEN enabled; SYNC asynchronous; BRGH hi_speed; CSRC slave_mode; 
     TXSTA = 0x24;
 
-    // Baud Rate = 9600; 
-    SPBRG = 0xCF;
+    // Baud Rate = 115200; 
+    SPBRG = 0x0F;
 
-    // Baud Rate = 9600; 
+    // Baud Rate = 115200; 
     SPBRGH = 0x00;
 
 
@@ -185,21 +192,49 @@ void EUSART_Transmit_ISR(void)
 
 void EUSART_Receive_ISR(void)
 {
+    uint8_t i = 0;
+    
     if(1 == RCSTAbits.OERR)
     {
         // EUSART error - restart
-
         RCSTAbits.CREN = 0;
         RCSTAbits.CREN = 1;
     }
-
+    
     // buffer overruns are ignored
-    eusartRxBuffer[eusartRxHead++] = RCREG;
-    if(sizeof(eusartRxBuffer) <= eusartRxHead)
+    
+    // ignore '\r' character
+    if(RCREG == '\r')
+        return;
+    // on newline, move buffer to commands array
+    else if (RCREG == '\n')
     {
-        eusartRxHead = 0;
+        // copy to commands buffer        
+        for(i=0; i < eusartRxCount; i++)
+            commandsReceived[commandsHead][i] = EUSART_Read();
+        
+        if(++commandsHead >= NB_COMMANDS)
+            commandsHead = 0;
+        
+        newCmd = true;
     }
-    eusartRxCount++;
+    else
+    {
+        eusartRxBuffer[eusartRxHead] = RCREG;
+        if(sizeof(eusartRxBuffer) <= ++eusartRxHead)
+            eusartRxHead = 0;
+        eusartRxCount++;        
+    }
+}
+
+uint8_t* EUSART_GetCommand()
+{
+    newCmd = false;
+    uint8_t* buffer = commandsReceived[commandsTail];
+    
+    
+    
+    return buffer;
 }
 /**
   End of File

@@ -45,33 +45,30 @@
 
 #include <xc.h>
 #include "pin_manager.h"
-#include "../i2c/i2c_helpers.h"
 
 void PIN_MANAGER_Initialize(void)
 {
     LATB = 0x0;
     LATA = 0x0;
-    ANSEL = 0x18;
+    ANSEL = 0x1F;
     ANSELH = 0xB;
     LATC = 0x0;
-    TRISB = 0xFF;
-    TRISC = 0xFF;
+    TRISB = 0xC3;
+    TRISC = 0xD8;
     WPUB = 0xFF;
-    TRISA = 0xF8;
+    TRISA = 0xC0;
 
     INTCON2bits.nRBPU = 0x0;
 
     // enable interrupt-on-change globally
     // enable interrupt-on-change globally    
     INTCONbits.RBIE = 1;   
-    INTCON2bits.INTEDG1 = 1;  
 }
 
 
 void PIN_MANAGER_IOC(void)
 {    
     // Please enable Interrupt-On-Change on at least one pin
-        
 }
 
 /**

@@ -54,7 +54,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "eusart.h"
 #include "i2c.h"
 
-#define _XTAL_FREQ  8000000
+#define _XTAL_FREQ  7372800
 
 /**
  * @Param

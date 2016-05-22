@@ -209,8 +209,8 @@ void I2C_Initialize(void)
     SSPSTAT = 0x00;
     // SSPEN enabled; WCOL no_collision; CKP Idle:Low, Active:High; SSPM FOSC/4_SSPxADD_I2C; SSPOV no_overflow; 
     SSPCON1 = 0x28;
-    // Baud Rate Generator Value: SSPADD 19;   
-    SSPADD = 0x13;
+    // Baud Rate Generator Value: SSPADD 3;   
+    SSPADD = 0x03;
 
    
     // clear the master interrupt flag

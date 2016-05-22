@@ -1,36 +1,62 @@
 #include "mcc_generated_files/mcc.h"
 #include "i2c/i2c_helpers.h"
+#include "ble/rn4020.h"
 
-#define INFO_I2C_PLUGGED    0x49
-#define CMD_READ            0x52 // 'R'
-#define CMD_WRITE           0x57 // 'W'
+//#define INFO_I2C_PLUGGED    0x49
+//#define CMD_READ            0x52 // 'R'
+//#define CMD_WRITE           0x57 // 'W'
 
-
-void main(void)
-{
-    uint8_t addr = 0;
+void main(void) {
+    //uint8_t addr = 0;
     uint8_t i = 0;
-    uint8_t length = 0;
-    uint8_t buffer[3];
-    SensorStatus_t oldSensorState;
-    
+    uint8_t* buffer;
+    //uint8_t length = 0;
+   // uint8_t buffer[128];
+    //uint8_t buffer[3];
+    //SensorStatus_t oldSensorState;
+
     SYSTEM_Initialize();
     INTERRUPT_GlobalInterruptEnable();
     INTERRUPT_PeripheralInterruptEnable();
 
-    sensorState.debounceCount = 0;
-    oldSensorState.plugged = false;
+    //sensorState.debounceCount = 0;
+    //oldSensorState.plugged = false;
+
+    IO_RA0_SetHigh();
+    IO_RA1_SetLow();
+    IO_RC5_SetHigh(); 
+    IO_RB4_SetHigh();
     
+    for(i=0; i<50; i++)
+        __delay_ms(50);
+    
+    i=0;
     IO_RA0_SetLow();
     
-    for(i = 0; i < 10; i++)
-    {
-        IO_RA0_Toggle();
-        __delay_ms(50);
-    }
+    printf("LS\r\n");    
     
-    while (1)
-    {        
+    for (;;) {
+        if(newCmd)
+        {
+            i++;
+            IO_RA0_Toggle();
+            buffer = EUSART_GetCommand();
+            IO_RA0_Toggle();
+        }
+        
+        if(i>=6)
+        {
+            i=0;
+            
+            for(i=0; i<20; i++)
+            {
+                IO_RA0_Toggle();
+                __delay_ms(50);
+                IO_RA0_Toggle();
+            }
+        }
+        
+        /*
         Debounce(!IO_RB1_GetValue(), &sensorState.plugged, &sensorState.debounceCount);
         
         // Plug/deplug event
@@ -103,6 +129,7 @@ void main(void)
             }
         }
         
-        oldSensorState = sensorState;
+        oldSensorState = sensorState;*/
     }
 }
+

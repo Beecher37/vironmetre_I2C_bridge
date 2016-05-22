@@ -222,6 +222,9 @@ void EUSART_Transmit_ISR(void);
 */
 void EUSART_Receive_ISR(void);
 
+extern bool newCmd;
+uint8_t* EUSART_GetCommand();
+
 #ifdef __cplusplus  // Provide C++ Compatibility
 
     }
