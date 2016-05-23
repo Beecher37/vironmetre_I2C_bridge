@@ -11,21 +11,21 @@ void main(void) {
     INTERRUPT_PeripheralInterruptEnable();
 
     IO_RA1_SetLow();
-    IO_RA0_SetLow();
+    IO_RA0_SetHigh();
     IO_RC5_SetLow();
     
     // CMD mode
     IO_RB4_SetHigh();
     for (i = 0; i < 40; i++)
         __delay_ms(50);
-
+    IO_RA0_SetLow();
     
-
+    IO_RA0_LAT = RN4020_Init();
+    
     for (;;) {
-        IO_RA0_LAT = RN4020_Init();
+        //for(i=0;i<100;i++)
+        //    __delay_ms(10);      
         
-        for(i=0;i<100;i++)
-            __delay_ms(10);
         //if (commandsCount > 0) {
         //    buffer = EUSART_GetCommand();
         //    printf("%s", buffer);

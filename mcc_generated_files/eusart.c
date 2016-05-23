@@ -245,6 +245,8 @@ void EUSART_Receive_ISR(void)
 
 uint8_t* EUSART_GetCommand()
 {
+    while(commandsCount == 0);
+    
    // uint8_t* buffer = commandsReceived[commandsBufferTail++];
     uint8_t* buf = commandsReceived[commandsBufferTail];
     

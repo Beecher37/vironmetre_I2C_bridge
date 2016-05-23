@@ -30,12 +30,24 @@ void RN4020_WriteCharacteristicBuffer(uint16_t UUID, uint8_t* buffer, uint8_t le
 
 bool RN4020_Init()
 {        
+    uint8_t i = 0;
+    
     RN4020_ClearInput(); 
     printf("LS\r\n");
-    __delay_ms(5);
-        
-    uint8_t* buffer = EUSART_GetCommand();
     
+    i += (strcmp(EUSART_GetCommand(), VIRON_SERVICE_ID) == 0);
+    i += (strcmp(EUSART_GetCommand(), "  3000,000E,V") == 0);
+    i += (strcmp(EUSART_GetCommand(), "  3000,000F,C") == 0);  
+    i += (strcmp(EUSART_GetCommand(), BATTERY_SERVICE_ID) == 0);
+    i += (strcmp(EUSART_GetCommand(), "  2A19,0012,V") == 0);
+    i += (strcmp(EUSART_GetCommand(), "  2A19,0013,C") == 0);
+    i += (strcmp(EUSART_GetCommand(), RN4020_END) == 0);    
+       
+    if(i >= 7)
+        return true;
+        
+    return false;
+    /*
     // Check that both services (battery, vironmetre) exist
     if (strcmp(EUSART_GetCommand(), VIRON_SERVICE_ID) == 0 &&
         strcmp(EUSART_GetCommand(), "  3000,000E,V") == 0 &&
@@ -50,6 +62,7 @@ bool RN4020_Init()
         RN4020_ClearInput();        
         return false;
     }
+    */
 }
 
 void RN4020_ClearInput()
@@ -63,11 +76,6 @@ void RN4020_ParseCommand()
 {
     
 }
-
-
-
-
-
 
 uint8_t RN4020_ReadLine(uint8_t* buffer, uint8_t maxLength)
 {
