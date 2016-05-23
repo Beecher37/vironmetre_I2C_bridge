@@ -48,12 +48,13 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
   Section: Included Files
 */
 #include "eusart.h"
+#include "pin_manager.h"
 
 /**
   Section: Macro Declarations
 */
 #define EUSART_TX_BUFFER_SIZE 32
-#define EUSART_RX_BUFFER_SIZE 32
+//#define EUSART_RX_BUFFER_SIZE 32
 
 /**
   Section: Global Variables
@@ -64,17 +65,19 @@ static uint8_t eusartTxTail = 0;
 static uint8_t eusartTxBuffer[EUSART_TX_BUFFER_SIZE];
 volatile uint8_t eusartTxBufferRemaining;
 
-static uint8_t eusartRxHead = 0;
-static uint8_t eusartRxTail = 0;
-static uint8_t eusartRxBuffer[EUSART_RX_BUFFER_SIZE];
-volatile uint8_t eusartRxCount;
+//static uint8_t eusartRxHead = 0;
+//static uint8_t eusartRxTail = 0;
+//static uint8_t eusartRxBuffer[EUSART_RX_BUFFER_SIZE];
+//volatile uint8_t eusartRxCount;
 
 #define NB_COMMANDS             8
+#define COMMAND_MAX_SIZE        32
 
-static uint8_t commandsReceived[NB_COMMANDS][EUSART_RX_BUFFER_SIZE];
-bool newCmd = false;
-static uint8_t commandsHead = 0;
-static uint8_t commandsTail = 0;
+static uint8_t commandsBufferHead = 0;
+static uint8_t commandsBufferTail = 0;
+static uint8_t commandsReceived[NB_COMMANDS][COMMAND_MAX_SIZE];
+static uint8_t commandPointer;
+volatile uint8_t commandsCount;
 
 /**
   Section: EUSART APIs
@@ -109,14 +112,19 @@ void EUSART_Initialize(void)
     eusartTxTail = 0;
     eusartTxBufferRemaining = sizeof(eusartTxBuffer);
 
-    eusartRxHead = 0;
-    eusartRxTail = 0;
-    eusartRxCount = 0;
+    //eusartRxHead = 0;
+    //eusartRxTail = 0;
+    //eusartRxCount = 0;
+    commandsBufferHead = 0;
+    commandsBufferTail = 0;
+    commandsCount = 0;
+    commandPointer = 0;
 
     // enable receive interrupt
     PIE1bits.RCIE = 1;
 }
 
+/*
 uint8_t EUSART_Read(void)
 {
     uint8_t readValue  = 0;
@@ -137,6 +145,7 @@ uint8_t EUSART_Read(void)
 
     return readValue;
 }
+*/
 
 void EUSART_Write(uint8_t txData)
 {
@@ -163,7 +172,8 @@ void EUSART_Write(uint8_t txData)
 
 char getch(void)
 {
-    return EUSART_Read();
+    return 0;
+//    return EUSART_Read();
 }
 
 void putch(char txData)
@@ -173,7 +183,6 @@ void putch(char txData)
 
 void EUSART_Transmit_ISR(void)
 {
-
     // add your EUSART interrupt custom code
     if(sizeof(eusartTxBuffer) > eusartTxBufferRemaining)
     {
@@ -191,9 +200,7 @@ void EUSART_Transmit_ISR(void)
 }
 
 void EUSART_Receive_ISR(void)
-{
-    uint8_t i = 0;
-    
+{    
     if(1 == RCSTAbits.OERR)
     {
         // EUSART error - restart
@@ -202,39 +209,51 @@ void EUSART_Receive_ISR(void)
     }
     
     // buffer overruns are ignored
-    
+        
     // ignore '\r' character
     if(RCREG == '\r')
         return;
-    // on newline, move buffer to commands array
-    else if (RCREG == '\n')
-    {
-        // copy to commands buffer        
-        for(i=0; i < eusartRxCount; i++)
-            commandsReceived[commandsHead][i] = EUSART_Read();
+    
+    // on newline, move buffer pointer
+    if (RCREG == '\n')
+    {     
+        if(++commandsBufferHead >= NB_COMMANDS)
+            commandsBufferHead = 0;
         
-        if(++commandsHead >= NB_COMMANDS)
-            commandsHead = 0;
+        commandsReceived[commandsBufferHead][commandPointer] = '\0';
         
-        newCmd = true;
+        commandsCount++;
+        commandPointer = 0;
     }
     else
     {
-        eusartRxBuffer[eusartRxHead] = RCREG;
-        if(sizeof(eusartRxBuffer) <= ++eusartRxHead)
-            eusartRxHead = 0;
-        eusartRxCount++;        
+        // If pointer OOB, move it back to 0 and change command slot
+        if(commandPointer >= COMMAND_MAX_SIZE)
+        {
+            commandsReceived[commandsBufferHead][commandPointer] = '\0';
+            if(++commandsBufferHead >= NB_COMMANDS)
+                commandsBufferHead = 0;
+            
+            commandsCount++;
+            commandPointer = 0;
+        }  
+        
+        // Copy char to buffer 
+        commandsReceived[commandsBufferHead][commandPointer++] = RCREG;
     }
 }
 
 uint8_t* EUSART_GetCommand()
 {
-    newCmd = false;
-    uint8_t* buffer = commandsReceived[commandsTail];
+   // uint8_t* buffer = commandsReceived[commandsBufferTail++];
+    uint8_t* buf = commandsReceived[commandsBufferTail];
     
-    
-    
-    return buffer;
+    if(++commandsBufferTail >= NB_COMMANDS)
+        commandsBufferTail = 0;
+    PIE1bits.RCIE = 0;
+    commandsCount--;
+    PIE1bits.RCIE = 1;
+    return buf;
 }
 /**
   End of File

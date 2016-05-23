@@ -122,7 +122,7 @@
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.CustomKey" moduleName="EUSART" name="SWRXBufferSize"/>
-         <value>64</value>
+         <value>32</value>
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.OptionKey" moduleName="RESET" registerAlias="RCON" settingAlias="PD" alias="POR or CLRWDT"/>
@@ -2046,7 +2046,7 @@
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.CustomKey" moduleName="EUSART" name="SWTXBufferSize"/>
-         <value>64</value>
+         <value>32</value>
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.CustomKey" moduleName="Pin Module" name="customised RB0"/>
@@ -3346,7 +3346,7 @@
       </entry>
       <entry>
          <file>mcc_generated_files\eusart.c</file>
-         <hash>f3700819bf7d8ff1a46d3eddc58d8925d6cb873d6c9b64f2224376f4fd0f32e1</hash>
+         <hash>441cb2daafe2e38318d1b47fe3f04db4f2724db0991c5884fdf6073c2dfb537c</hash>
       </entry>
       <entry>
          <file>mcc_generated_files\i2c.h</file>

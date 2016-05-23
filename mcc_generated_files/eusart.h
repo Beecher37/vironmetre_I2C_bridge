@@ -66,7 +66,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
   Section: Macro Declarations
 */
 
-#define EUSART_DataReady  (eusartRxCount)
+//#define EUSART_DataReady  (eusartRxCount)
 
 /**
   Section: Data Type Definitions
@@ -76,7 +76,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
  Section: Global variables
  */
 extern volatile uint8_t eusartTxBufferRemaining;
-extern volatile uint8_t eusartRxCount;
+//extern volatile uint8_t eusartRxCount;
 
 
 /**
@@ -153,7 +153,7 @@ void EUSART_Initialize(void);
 							}
     </code>
 */
-uint8_t EUSART_Read(void);
+//uint8_t EUSART_Read(void);
 
  /**
   @Summary
@@ -222,7 +222,7 @@ void EUSART_Transmit_ISR(void);
 */
 void EUSART_Receive_ISR(void);
 
-extern bool newCmd;
+extern volatile uint8_t commandsCount;
 uint8_t* EUSART_GetCommand();
 
 #ifdef __cplusplus  // Provide C++ Compatibility

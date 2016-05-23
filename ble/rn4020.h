@@ -50,12 +50,16 @@ extern "C" {
 void RN4020_WriteCharacteristicByte(uint16_t UUID, uint8_t v);
 void RN4020_WriteCharacteristicWord(uint16_t UUID, uint16_t v);
 void RN4020_WriteCharacteristicBuffer(uint16_t UUID, uint8_t* buf, uint8_t len);
-
+/*
 void RN4020_ParseCommand();
+
+
+
+uint8_t RN4020_ReadLine(uint8_t* buffer, uint8_t maxLength);
+*/
 
 bool RN4020_Init();
 void RN4020_ClearInput();
-uint8_t RN4020_ReadLine(uint8_t* buffer, uint8_t maxLength);
 
 #ifdef	__cplusplus
 }

@@ -1,4 +1,5 @@
 #include "rn4020.h"
+#include "../mcc_generated_files/mcc.h"
 #include <string.h>
 
 void RN4020_WriteCharacteristicByte(uint16_t UUID, uint8_t value)
@@ -27,41 +28,46 @@ void RN4020_WriteCharacteristicBuffer(uint16_t UUID, uint8_t* buffer, uint8_t le
     RN4020_EXECCMD();
 }
 
+bool RN4020_Init()
+{        
+    RN4020_ClearInput(); 
+    printf("LS\r\n");
+    __delay_ms(5);
+        
+    uint8_t* buffer = EUSART_GetCommand();
+    
+    // Check that both services (battery, vironmetre) exist
+    if (strcmp(EUSART_GetCommand(), VIRON_SERVICE_ID) == 0 &&
+        strcmp(EUSART_GetCommand(), "  3000,000E,V") == 0 &&
+        strcmp(EUSART_GetCommand(), "  3000,000F,C") == 0 &&
+        strcmp(EUSART_GetCommand(), BATTERY_SERVICE_ID) == 0 &&
+        strcmp(EUSART_GetCommand(), "  2A19,0012,V") == 0 &&
+        strcmp(EUSART_GetCommand(), "  2A19,0013,C") == 0 &&
+        strcmp(EUSART_GetCommand(), RN4020_END) == 0)
+        return true; 
+    else
+    {
+        RN4020_ClearInput();        
+        return false;
+    }
+}
+
+void RN4020_ClearInput()
+{
+    while(commandsCount > 0)
+        EUSART_GetCommand();
+}
+
+/*
 void RN4020_ParseCommand()
 {
     
 }
 
-bool RN4020_Init()
-{
-    uint8_t buffer[32];    
-    printf("LS\r\n");
-    
-    // Check that both services (battery, vironmetre) exist
-    if(!RN4020_ReadLine(buffer, 32) || strcmp(buffer, VIRON_SERVICE_ID))
-        return false; 
-    if(!RN4020_ReadLine(buffer, 32) || strcmp(buffer, "  3000,000E,V"))
-        return false;
-    if(!RN4020_ReadLine(buffer, 32) || strcmp(buffer, "  3000,000F,C"))
-        return false;
-    
-    if(!RN4020_ReadLine(buffer, 32) || strcmp(buffer, BATTERY_SERVICE_ID))
-        return false; 
-    if(!RN4020_ReadLine(buffer, 32) || strcmp(buffer, "  2A19,0012,V"))
-        return false;
-    if(!RN4020_ReadLine(buffer, 32) || strcmp(buffer, "  2A19,0013,C"))
-        return false;
-    if(!RN4020_ReadLine(buffer, 32) || strcmp(buffer, RN4020_END))
-        return false;
-    
-    return true;
-}
 
-void RN4020_ClearInput()
-{
-    while(EUSART_DataReady > 0)
-        EUSART_Read();
-}
+
+
+
 
 uint8_t RN4020_ReadLine(uint8_t* buffer, uint8_t maxLength)
 {
@@ -94,3 +100,4 @@ uint8_t RN4020_ReadLine(uint8_t* buffer, uint8_t maxLength)
     
     return i;
 }
+*/
