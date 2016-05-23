@@ -4,8 +4,12 @@
 
 void main(void) {
     uint8_t i = 0;
-   // uint8_t* buffer = NULL;
-    
+    SensorStatus_t oldSensorState = DEFAULT_SENSORSTATUS;
+    uint8_t opBuffer[20] = {0};
+    uint8_t opLength = 0;
+    uint8_t* command = NULL;
+    uint16_t receivedHandle = 0;
+
     SYSTEM_Initialize();
     INTERRUPT_GlobalInterruptEnable();
     INTERRUPT_PeripheralInterruptEnable();
@@ -13,99 +17,64 @@ void main(void) {
     IO_RA1_SetLow();
     IO_RA0_SetHigh();
     IO_RC5_SetLow();
-    
+
     // CMD mode
-    IO_RB4_SetHigh();
+    //IO_RB4_SetHigh();
     for (i = 0; i < 40; i++)
         __delay_ms(50);
     IO_RA0_SetLow();
-    
-    IO_RA0_LAT = RN4020_Init();
-    
-    for (;;) {
-        //for(i=0;i<100;i++)
-        //    __delay_ms(10);      
-        
-        //if (commandsCount > 0) {
-        //    buffer = EUSART_GetCommand();
-        //    printf("%s", buffer);
-        //}
 
-        /*
-        Debounce(!IO_RB1_GetValue(), &sensorState.plugged, &sensorState.debounceCount);
-        
-        // Plug/deplug event
-        if(sensorState.plugged != oldSensorState.plugged)
-        {
-            EUSART_Write(INFO_I2C_PLUGGED);
-            EUSART_Write(sensorState.plugged);
+    if (RN4020_Init()) {
+        for (;;) {
             
-            // On plug, reset I2C and send address
-            if(sensorState.plugged)
-            {
-                I2C_Initialize();
-                EUSART_Write(I2C_FirstDevice());
-            }
-        }
-        
-        // Get messages
-        if(sensorState.plugged)
-        {
-            // Full message received
-            if(EUSART_DataReady >= 3)
-            {
-                IO_RA0_SetHigh();
-                switch(EUSART_Read())
-                {
-                    case CMD_READ:
-                        addr = EUSART_Read();
-                        length = EUSART_Read();
-                        
-                        if(length > 0)
-                        {
-                            if(I2C_ReadBytes(addr, buffer, length))
-                            {
-                                EUSART_Write(CMD_READ);
-                                EUSART_Write(length);
+            IO_RB4_LAT = IO_RB0_GetValue();
+            
+            // Read I/O, read serialport     
+            Debounce(!IO_RB1_GetValue(), &sensorState.plugged, &sensorState.debounceCount);
 
-                                for(i = 0; i < length; i++)
-                                    EUSART_Write(buffer[i]);
-                            }
-                        }
-                        break;
-                        
-                    case CMD_WRITE:
-                        addr = EUSART_Read();
-                        length = EUSART_Read();
-                                                
-                        if(length > 0)
-                        {
-                            for(i = 0; i < length; i++)
-                                buffer[i] = EUSART_Read();
-                            
-                            EUSART_Write(CMD_WRITE);
-                            if(I2C_WriteBytes(addr, buffer, length))
-                            {
-                                EUSART_Write(length);
-                            }
-                            else
-                                EUSART_Write(0);
-                        }
-                        break;
-                    
-                    default:
-                        while(EUSART_DataReady)
-                            EUSART_Read();
-                        break;
-                                
+            // Plug/deplug event
+            if (sensorState.plugged != oldSensorState.plugged) {
+                opLength = 1;
+
+                // On plug, reset I2C and send address
+                if (sensorState.plugged) {
+                    I2C_Initialize();
+                    __delay_ms(5);
+                    opBuffer[opLength++] = I2C_FirstDevice();
                 }
-                
-                IO_RA0_SetLow();
+
+                RN4020_WriteCharacteristicBuffer(CONNECTION_ID, opBuffer, opLength);
             }
+
+
+            if (commandsCount > 0) {
+                command = EUSART_GetCommand();
+
+                // Handle request
+                if (startsWith(command, RN4020_REMOTE_WR_VAL)) {
+                    command = command + 3;
+                    receivedHandle = ASCIIToHex16(command);
+
+                    if (receivedHandle == REQUEST_HANDLE) {
+                        command = command + 5;
+                        opLength = 0;
+                        do {
+                            opBuffer[opLength++] = ASCIIToHex8(command);
+                            command = command + 2;
+                        } while (*command != '.');
+
+                        // Process command bytes
+                    }
+                }
+            }
+
+            oldSensorState = sensorState;
         }
-        
-        oldSensorState = sensorState;
-        */
+    }
+    else {
+        IO_RA0_SetHigh();
+        for (;;) {
+        }
     }
 }
 

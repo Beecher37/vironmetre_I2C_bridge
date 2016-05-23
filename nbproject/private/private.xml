@@ -4,7 +4,7 @@
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
             <file>file:/C:/Users/Thomas/Documents/GitHub/vironmetre_I2C_bridge/main.c</file>
-            <file>file:/C:/Users/Thomas/Documents/GitHub/vironmetre_I2C_bridge/mcc_generated_files/pin_manager.h</file>
+            <file>file:/C:/Users/Thomas/Documents/GitHub/vironmetre_I2C_bridge/ble/rn4020.h</file>
             <file>file:/C:/Users/Thomas/Documents/GitHub/vironmetre_I2C_bridge/ble/rn4020.c</file>
             <file>file:/C:/Users/Thomas/Documents/GitHub/vironmetre_I2C_bridge/mcc_generated_files/eusart.c</file>
         </group>
