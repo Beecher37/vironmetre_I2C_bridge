@@ -5,48 +5,62 @@
 void main(void) {
     uint8_t i = 0;
     SensorStatus_t oldSensorState = DEFAULT_SENSORSTATUS;
-    uint8_t opBuffer[20] = {0};
-    uint8_t opLength = 0;
+//    uint8_t opBuffer[20] = {0};
+//    uint8_t opLength = 0;
     uint8_t* command = NULL;
     uint16_t receivedHandle = 0;
 
     SYSTEM_Initialize();
     INTERRUPT_GlobalInterruptEnable();
     INTERRUPT_PeripheralInterruptEnable();
-
-    IO_RA1_SetLow();
-    IO_RA0_SetHigh();
-    IO_RC5_SetLow();
-
-    // CMD mode
-    //IO_RB4_SetHigh();
-    for (i = 0; i < 40; i++)
-        __delay_ms(50);
+    IO_RA1_SetLow(); IO_RA0_SetHigh(); IO_RC5_SetLow(); IO_RB4_SetHigh();
+    
+    for (i = 0; i < 40; i++) { __delay_ms(50); }
     IO_RA0_SetLow();
-
+    
     if (RN4020_Init()) {
         for (;;) {
-            
-            IO_RB4_LAT = IO_RB0_GetValue();
-            
             // Read I/O, read serialport     
             Debounce(!IO_RB1_GetValue(), &sensorState.plugged, &sensorState.debounceCount);
-
+                        
             // Plug/deplug event
             if (sensorState.plugged != oldSensorState.plugged) {
-                opLength = 1;
-
+                //opLength = 0;
+               // opBuffer[opLength++] = sensorState.plugged;
+               IO_RA0_SetHigh();__delay_ms(50);__delay_ms(50);__delay_ms(50);__delay_ms(50);IO_RA0_SetLow();
+                
                 // On plug, reset I2C and send address
                 if (sensorState.plugged) {
-                    I2C_Initialize();
-                    __delay_ms(5);
-                    opBuffer[opLength++] = I2C_FirstDevice();
+                    I2C_Initialize(); __delay_ms(5);
+                    sensorState.addr = I2C_FirstDevice();
+                   // opBuffer[opLength++] = sensorState.addr;
                 }
-
-                RN4020_WriteCharacteristicBuffer(CONNECTION_ID, opBuffer, opLength);
+                
+                RN4020_NotifyPlug();
+                request.doWork = false;
+                //RN4020_WriteCharacteristicBuffer(CONNECTION_HANDLE, opBuffer, opLength);
+            }
+            
+            // Do requests
+            if(request.doWork)
+            {                
+                if(request.data[0] == 0x01)
+                {
+                    if(I2C_ReadBytes(sensorState.addr, request.data + 2, request.data[1]))
+                    {
+                        RN4020_AnswerRequest();
+                    }
+                }
+                else
+                {
+                    if(I2C_WriteBytes(sensorState.addr, request.data + 2, request.data[1]))
+                    {
+                        RN4020_AnswerRequest();
+                    }
+                }
             }
 
-
+            // Read commands
             if (commandsCount > 0) {
                 command = EUSART_GetCommand();
 
@@ -57,13 +71,18 @@ void main(void) {
 
                     if (receivedHandle == REQUEST_HANDLE) {
                         command = command + 5;
-                        opLength = 0;
+                        request.length = 0;
+                        //request.data[0] = ASCIIToHex8(command);
+                        //receivedHandle = ASCIIToHex8(command);
+                        
                         do {
-                            opBuffer[opLength++] = ASCIIToHex8(command);
+                            request.data[request.length++] = ASCIIToHex8(command);
                             command = command + 2;
                         } while (*command != '.');
 
                         // Process command bytes
+                        request.doWork = true;
+                        
                     }
                 }
             }
@@ -73,8 +92,7 @@ void main(void) {
     }
     else {
         IO_RA0_SetHigh();
-        for (;;) {
-        }
+        for (;;) {}
     }
 }
 

@@ -1,6 +1,38 @@
 #include "rn4020.h"
 #include "../mcc_generated_files/mcc.h"
+#include "../i2c/i2c_helpers.h"
 #include <string.h>
+
+remote_req_t request;
+
+void RN4020_NotifyPlug()
+{
+    printf(RN4020_WRITE_CHAR, CONNECTION_HANDLE);
+    
+    printf("%02X", sensorState.plugged);
+    if(sensorState.plugged)
+        printf("%02X", sensorState.addr);
+
+    RN4020_EXECCMD();
+}
+
+void RN4020_AnswerRequest()
+{
+    uint8_t i = 0;
+ 
+    request.doWork = false;
+    printf(RN4020_WRITE_CHAR, ANSWER_HANDLE);
+    
+    printf("%02X", request.data[0]);
+    printf("%02X", request.data[1]);
+    
+    if(request.data[0] == 1)
+    {
+        for(i = 0; i < request.data[1]; i++)
+            printf("%02X", request.data[i+2]);
+    }
+    RN4020_EXECCMD();    
+}
 
 void RN4020_WriteCharacteristicByte(uint16_t UUID, uint8_t value) {
     RN4020_WriteCharacteristicBuffer(UUID, &value, 1);
@@ -18,7 +50,7 @@ void RN4020_WriteCharacteristicBuffer(uint16_t UUID, uint8_t* buffer, uint8_t le
     uint8_t i = 0;
     printf(RN4020_WRITE_CHAR, UUID);
     for (i = 0; i < length; i++)
-        printf("%X2", buffer[i]);
+        printf("%02X", buffer[i]);
     RN4020_EXECCMD();
 }
 
@@ -95,9 +127,9 @@ uint16_t ASCIIToHex16(uint8_t* hexStr)
            ASCIIToNibble(*hexStr);
 }
 
-uint8_t ASCIIToHex8(uint8_t* hexStr)
+uint16_t ASCIIToHex8(uint8_t* hexStr)
 {
-    return (uint8_t)(ASCIIToNibble(*hexStr++) << 4 | ASCIIToNibble(*hexStr));
+    return (ASCIIToNibble(*hexStr++) << 4) | (ASCIIToNibble(*hexStr));
 }
 
 /*

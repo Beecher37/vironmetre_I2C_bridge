@@ -19,7 +19,6 @@ extern "C" {
 // Common RN4020 commands and strings  
 ////////////////////////////////////////////////////////////////////////////////
 #define RN4020_NEWLINE                  "\r\n"
-#define RN4020_EXECCMD()                puts(RN4020_NEWLINE)
 #define RN4020_CMD                      "CMD"
 #define RN4020_END                      "END"
 #define RN4020_AOK                      "AOK"
@@ -31,8 +30,8 @@ extern "C" {
 // Services and characteristics
 ////////////////////////////////////////////////////////////////////////////////
 
-#define RN4020_WRITE_CHAR               "SUW,%X4,"
-#define RN4020_READ_CHAR                "SUR,%X4"
+#define RN4020_WRITE_CHAR               "SHW,%04X,"
+#define RN4020_READ_CHAR                "SHR,%04X"
     
 // Battery service
 #define BATTERY_SERVICE_ID              "180F"
@@ -66,19 +65,36 @@ extern "C" {
 #define RN4020_REMOTE_WR_CHAR           "WC"
 #define RN4020_REMOTE_WR_VAL            "WV"    
     
+
+        
     
+typedef struct
+{
+    bool            doWork;
+    uint8_t         length;
+    uint8_t         data[20];
+} remote_req_t;
+
+extern remote_req_t request;
+
 #define RN4020_ListServices()           printf("LS\r\n")
-    
-void RN4020_WriteCharacteristicByte(uint16_t UUID, uint8_t v);
-void RN4020_WriteCharacteristicWord(uint16_t UUID, uint16_t v);
-void RN4020_WriteCharacteristicBuffer(uint16_t UUID, uint8_t* buf, uint8_t len);
+#define RN4020_EXECCMD()                puts(RN4020_NEWLINE)
+
+void RN4020_NotifyPlug();
+void RN4020_AnswerRequest();
+
+void RN4020_WriteCharacteristicByte(uint16_t handle, uint8_t v);
+void RN4020_WriteCharacteristicWord(uint16_t handle, uint16_t v);
+void RN4020_WriteCharacteristicBuffer(uint16_t handle, uint8_t* buf, uint8_t len);
 
 bool RN4020_Init();
 void RN4020_ClearInput();
+
+// Helpers
 bool startsWith(const char *str, const char *pre);
 uint16_t ASCIIToNibble(uint8_t nib);
 uint16_t ASCIIToHex16(uint8_t* hexStr);
-uint8_t ASCIIToHex8(uint8_t* hexStr);
+uint16_t ASCIIToHex8(uint8_t* hexStr);
 
 #ifdef	__cplusplus
 }
