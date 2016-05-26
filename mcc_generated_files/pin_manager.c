@@ -13,7 +13,7 @@
   Description:
     This header file provides implementations for pin APIs for all pins selected in the GUI.
     Generation Information :
-        Product Revision  :  MPLAB(c) Code Configurator - v3.00
+        Product Revision  :  MPLAB(c) Code Configurator - 3.15.0
         Device            :  PIC18F25K20
         Driver Version    :  1.02
     The generated drivers are tested against the following:
@@ -48,11 +48,11 @@
 
 void PIN_MANAGER_Initialize(void)
 {
-    LATB = 0x0;
-    LATA = 0x0;
-    ANSEL = 0x1F;
-    ANSELH = 0xB;
-    LATC = 0x0;
+    LATB = 0x4;
+    LATA = 0x3D;
+    ANSEL = 0x0;
+    ANSELH = 0x0;
+    LATC = 0x7;
     TRISB = 0xC3;
     TRISC = 0xD8;
     WPUB = 0xFF;
@@ -60,15 +60,14 @@ void PIN_MANAGER_Initialize(void)
 
     INTCON2bits.nRBPU = 0x0;
 
-    // enable interrupt-on-change globally
-    // enable interrupt-on-change globally    
-    INTCONbits.RBIE = 1;   
+    INTCONbits.RBIE = 1; // Enable RBI interrupt 
+
+
 }
 
 
 void PIN_MANAGER_IOC(void)
 {    
-    // Please enable Interrupt-On-Change on at least one pin
 }
 
 /**

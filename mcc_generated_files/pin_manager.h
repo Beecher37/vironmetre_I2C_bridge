@@ -13,7 +13,7 @@
   @Description:
     This header file provides implementations for pin APIs for all pins selected in the GUI.
     Generation Information :
-        Product Revision  :  MPLAB(c) Code Configurator - v3.00
+        Product Revision  :  MPLAB(c) Code Configurator - 3.15.0
         Device            :  PIC18F25K20
         Version           :  1.01
     The generated drivers are tested against the following:
@@ -59,192 +59,192 @@
 #define PULL_UP_ENABLED      1
 #define PULL_UP_DISABLED     0
 
-// get/set IO_RA0 aliases
-#define IO_RA0_TRIS               TRISA0
-#define IO_RA0_LAT                LATA0
-#define IO_RA0_PORT               RA0
-#define IO_RA0_ANS                ANS0
-#define IO_RA0_SetHigh()    do { LATA0 = 1; } while(0)
-#define IO_RA0_SetLow()   do { LATA0 = 0; } while(0)
-#define IO_RA0_Toggle()   do { LATA0 = ~LATA0; } while(0)
-#define IO_RA0_GetValue()         RA0
-#define IO_RA0_SetDigitalInput()    do { TRISA0 = 1; } while(0)
-#define IO_RA0_SetDigitalOutput()   do { TRISA0 = 0; } while(0)
+// get/set CONN_TEST_0 aliases
+#define CONN_TEST_0_TRIS               TRISA0
+#define CONN_TEST_0_LAT                LATA0
+#define CONN_TEST_0_PORT               RA0
+#define CONN_TEST_0_ANS                ANS0
+#define CONN_TEST_0_SetHigh()    do { LATA0 = 1; } while(0)
+#define CONN_TEST_0_SetLow()   do { LATA0 = 0; } while(0)
+#define CONN_TEST_0_Toggle()   do { LATA0 = ~LATA0; } while(0)
+#define CONN_TEST_0_GetValue()         PORTAbits.RA0
+#define CONN_TEST_0_SetDigitalInput()    do { TRISA0 = 1; } while(0)
+#define CONN_TEST_0_SetDigitalOutput()   do { TRISA0 = 0; } while(0)
 
-#define IO_RA0_SetAnalogMode()   do { ANS0 = 1; } while(0)
-#define IO_RA0_SetDigitalMode()   do { ANS0 = 0; } while(0)
-
-
-// get/set IO_RA1 aliases
-#define IO_RA1_TRIS               TRISA1
-#define IO_RA1_LAT                LATA1
-#define IO_RA1_PORT               RA1
-#define IO_RA1_ANS                ANS1
-#define IO_RA1_SetHigh()    do { LATA1 = 1; } while(0)
-#define IO_RA1_SetLow()   do { LATA1 = 0; } while(0)
-#define IO_RA1_Toggle()   do { LATA1 = ~LATA1; } while(0)
-#define IO_RA1_GetValue()         RA1
-#define IO_RA1_SetDigitalInput()    do { TRISA1 = 1; } while(0)
-#define IO_RA1_SetDigitalOutput()   do { TRISA1 = 0; } while(0)
-
-#define IO_RA1_SetAnalogMode()   do { ANS1 = 1; } while(0)
-#define IO_RA1_SetDigitalMode()   do { ANS1 = 0; } while(0)
+#define CONN_TEST_0_SetAnalogMode()   do { ANS0 = 1; } while(0)
+#define CONN_TEST_0_SetDigitalMode()   do { ANS0 = 0; } while(0)
 
 
-// get/set IO_RA2 aliases
-#define IO_RA2_TRIS               TRISA2
-#define IO_RA2_LAT                LATA2
-#define IO_RA2_PORT               RA2
-#define IO_RA2_ANS                ANS2
-#define IO_RA2_SetHigh()    do { LATA2 = 1; } while(0)
-#define IO_RA2_SetLow()   do { LATA2 = 0; } while(0)
-#define IO_RA2_Toggle()   do { LATA2 = ~LATA2; } while(0)
-#define IO_RA2_GetValue()         RA2
-#define IO_RA2_SetDigitalInput()    do { TRISA2 = 1; } while(0)
-#define IO_RA2_SetDigitalOutput()   do { TRISA2 = 0; } while(0)
+// get/set CONN_TEST_1 aliases
+#define CONN_TEST_1_TRIS               TRISA1
+#define CONN_TEST_1_LAT                LATA1
+#define CONN_TEST_1_PORT               RA1
+#define CONN_TEST_1_ANS                ANS1
+#define CONN_TEST_1_SetHigh()    do { LATA1 = 1; } while(0)
+#define CONN_TEST_1_SetLow()   do { LATA1 = 0; } while(0)
+#define CONN_TEST_1_Toggle()   do { LATA1 = ~LATA1; } while(0)
+#define CONN_TEST_1_GetValue()         PORTAbits.RA1
+#define CONN_TEST_1_SetDigitalInput()    do { TRISA1 = 1; } while(0)
+#define CONN_TEST_1_SetDigitalOutput()   do { TRISA1 = 0; } while(0)
 
-#define IO_RA2_SetAnalogMode()   do { ANS2 = 1; } while(0)
-#define IO_RA2_SetDigitalMode()   do { ANS2 = 0; } while(0)
-
-
-// get/set IO_RA3 aliases
-#define IO_RA3_TRIS               TRISA3
-#define IO_RA3_LAT                LATA3
-#define IO_RA3_PORT               RA3
-#define IO_RA3_ANS                ANS3
-#define IO_RA3_SetHigh()    do { LATA3 = 1; } while(0)
-#define IO_RA3_SetLow()   do { LATA3 = 0; } while(0)
-#define IO_RA3_Toggle()   do { LATA3 = ~LATA3; } while(0)
-#define IO_RA3_GetValue()         RA3
-#define IO_RA3_SetDigitalInput()    do { TRISA3 = 1; } while(0)
-#define IO_RA3_SetDigitalOutput()   do { TRISA3 = 0; } while(0)
-
-#define IO_RA3_SetAnalogMode()   do { ANS3 = 1; } while(0)
-#define IO_RA3_SetDigitalMode()   do { ANS3 = 0; } while(0)
+#define CONN_TEST_1_SetAnalogMode()   do { ANS1 = 1; } while(0)
+#define CONN_TEST_1_SetDigitalMode()   do { ANS1 = 0; } while(0)
 
 
-// get/set IO_RA4 aliases
-#define IO_RA4_TRIS               TRISA4
-#define IO_RA4_LAT                LATA4
-#define IO_RA4_PORT               RA4
-#define IO_RA4_SetHigh()    do { LATA4 = 1; } while(0)
-#define IO_RA4_SetLow()   do { LATA4 = 0; } while(0)
-#define IO_RA4_Toggle()   do { LATA4 = ~LATA4; } while(0)
-#define IO_RA4_GetValue()         RA4
-#define IO_RA4_SetDigitalInput()    do { TRISA4 = 1; } while(0)
-#define IO_RA4_SetDigitalOutput()   do { TRISA4 = 0; } while(0)
+// get/set CONN_TEST_2 aliases
+#define CONN_TEST_2_TRIS               TRISA2
+#define CONN_TEST_2_LAT                LATA2
+#define CONN_TEST_2_PORT               RA2
+#define CONN_TEST_2_ANS                ANS2
+#define CONN_TEST_2_SetHigh()    do { LATA2 = 1; } while(0)
+#define CONN_TEST_2_SetLow()   do { LATA2 = 0; } while(0)
+#define CONN_TEST_2_Toggle()   do { LATA2 = ~LATA2; } while(0)
+#define CONN_TEST_2_GetValue()         PORTAbits.RA2
+#define CONN_TEST_2_SetDigitalInput()    do { TRISA2 = 1; } while(0)
+#define CONN_TEST_2_SetDigitalOutput()   do { TRISA2 = 0; } while(0)
+
+#define CONN_TEST_2_SetAnalogMode()   do { ANS2 = 1; } while(0)
+#define CONN_TEST_2_SetDigitalMode()   do { ANS2 = 0; } while(0)
+
+
+// get/set CONN_TEST_3 aliases
+#define CONN_TEST_3_TRIS               TRISA3
+#define CONN_TEST_3_LAT                LATA3
+#define CONN_TEST_3_PORT               RA3
+#define CONN_TEST_3_ANS                ANS3
+#define CONN_TEST_3_SetHigh()    do { LATA3 = 1; } while(0)
+#define CONN_TEST_3_SetLow()   do { LATA3 = 0; } while(0)
+#define CONN_TEST_3_Toggle()   do { LATA3 = ~LATA3; } while(0)
+#define CONN_TEST_3_GetValue()         PORTAbits.RA3
+#define CONN_TEST_3_SetDigitalInput()    do { TRISA3 = 1; } while(0)
+#define CONN_TEST_3_SetDigitalOutput()   do { TRISA3 = 0; } while(0)
+
+#define CONN_TEST_3_SetAnalogMode()   do { ANS3 = 1; } while(0)
+#define CONN_TEST_3_SetDigitalMode()   do { ANS3 = 0; } while(0)
+
+
+// get/set CONN_TEST_4 aliases
+#define CONN_TEST_4_TRIS               TRISA4
+#define CONN_TEST_4_LAT                LATA4
+#define CONN_TEST_4_PORT               RA4
+#define CONN_TEST_4_SetHigh()    do { LATA4 = 1; } while(0)
+#define CONN_TEST_4_SetLow()   do { LATA4 = 0; } while(0)
+#define CONN_TEST_4_Toggle()   do { LATA4 = ~LATA4; } while(0)
+#define CONN_TEST_4_GetValue()         PORTAbits.RA4
+#define CONN_TEST_4_SetDigitalInput()    do { TRISA4 = 1; } while(0)
+#define CONN_TEST_4_SetDigitalOutput()   do { TRISA4 = 0; } while(0)
 
 
 
-// get/set IO_RA5 aliases
-#define IO_RA5_TRIS               TRISA5
-#define IO_RA5_LAT                LATA5
-#define IO_RA5_PORT               RA5
-#define IO_RA5_ANS                ANS4
-#define IO_RA5_SetHigh()    do { LATA5 = 1; } while(0)
-#define IO_RA5_SetLow()   do { LATA5 = 0; } while(0)
-#define IO_RA5_Toggle()   do { LATA5 = ~LATA5; } while(0)
-#define IO_RA5_GetValue()         RA5
-#define IO_RA5_SetDigitalInput()    do { TRISA5 = 1; } while(0)
-#define IO_RA5_SetDigitalOutput()   do { TRISA5 = 0; } while(0)
+// get/set CONN_TEST_5 aliases
+#define CONN_TEST_5_TRIS               TRISA5
+#define CONN_TEST_5_LAT                LATA5
+#define CONN_TEST_5_PORT               RA5
+#define CONN_TEST_5_ANS                ANS4
+#define CONN_TEST_5_SetHigh()    do { LATA5 = 1; } while(0)
+#define CONN_TEST_5_SetLow()   do { LATA5 = 0; } while(0)
+#define CONN_TEST_5_Toggle()   do { LATA5 = ~LATA5; } while(0)
+#define CONN_TEST_5_GetValue()         PORTAbits.RA5
+#define CONN_TEST_5_SetDigitalInput()    do { TRISA5 = 1; } while(0)
+#define CONN_TEST_5_SetDigitalOutput()   do { TRISA5 = 0; } while(0)
 
-#define IO_RA5_SetAnalogMode()   do { ANS4 = 1; } while(0)
-#define IO_RA5_SetDigitalMode()   do { ANS4 = 0; } while(0)
-
-
-// get/set IO_RB0 aliases
-#define IO_RB0_TRIS               TRISB0
-#define IO_RB0_LAT                LATB0
-#define IO_RB0_PORT               RB0
-#define IO_RB0_WPU                WPUB0
-#define IO_RB0_ANS                ANS12
-#define IO_RB0_SetHigh()    do { LATB0 = 1; } while(0)
-#define IO_RB0_SetLow()   do { LATB0 = 0; } while(0)
-#define IO_RB0_Toggle()   do { LATB0 = ~LATB0; } while(0)
-#define IO_RB0_GetValue()         RB0
-#define IO_RB0_SetDigitalInput()    do { TRISB0 = 1; } while(0)
-#define IO_RB0_SetDigitalOutput()   do { TRISB0 = 0; } while(0)
-
-#define IO_RB0_SetPullup()    do { WPUB0 = 1; } while(0)
-#define IO_RB0_ResetPullup()   do { WPUB0 = 0; } while(0)
-#define IO_RB0_SetAnalogMode()   do { ANS12 = 1; } while(0)
-#define IO_RB0_SetDigitalMode()   do { ANS12 = 0; } while(0)
+#define CONN_TEST_5_SetAnalogMode()   do { ANS4 = 1; } while(0)
+#define CONN_TEST_5_SetDigitalMode()   do { ANS4 = 0; } while(0)
 
 
-// get/set IO_RB1 aliases
-#define IO_RB1_TRIS               TRISB1
-#define IO_RB1_LAT                LATB1
-#define IO_RB1_PORT               RB1
-#define IO_RB1_WPU                WPUB1
-#define IO_RB1_ANS                ANS10
-#define IO_RB1_SetHigh()    do { LATB1 = 1; } while(0)
-#define IO_RB1_SetLow()   do { LATB1 = 0; } while(0)
-#define IO_RB1_Toggle()   do { LATB1 = ~LATB1; } while(0)
-#define IO_RB1_GetValue()         RB1
-#define IO_RB1_SetDigitalInput()    do { TRISB1 = 1; } while(0)
-#define IO_RB1_SetDigitalOutput()   do { TRISB1 = 0; } while(0)
+// get/set BT_CONN aliases
+#define BT_CONN_TRIS               TRISB0
+#define BT_CONN_LAT                LATB0
+#define BT_CONN_PORT               RB0
+#define BT_CONN_WPU                WPUB0
+#define BT_CONN_ANS                ANS12
+#define BT_CONN_SetHigh()    do { LATB0 = 1; } while(0)
+#define BT_CONN_SetLow()   do { LATB0 = 0; } while(0)
+#define BT_CONN_Toggle()   do { LATB0 = ~LATB0; } while(0)
+#define BT_CONN_GetValue()         PORTBbits.RB0
+#define BT_CONN_SetDigitalInput()    do { TRISB0 = 1; } while(0)
+#define BT_CONN_SetDigitalOutput()   do { TRISB0 = 0; } while(0)
 
-#define IO_RB1_SetPullup()    do { WPUB1 = 1; } while(0)
-#define IO_RB1_ResetPullup()   do { WPUB1 = 0; } while(0)
-#define IO_RB1_SetAnalogMode()   do { ANS10 = 1; } while(0)
-#define IO_RB1_SetDigitalMode()   do { ANS10 = 0; } while(0)
-
-
-// get/set IO_RB2 aliases
-#define IO_RB2_TRIS               TRISB2
-#define IO_RB2_LAT                LATB2
-#define IO_RB2_PORT               RB2
-#define IO_RB2_WPU                WPUB2
-#define IO_RB2_ANS                ANS8
-#define IO_RB2_SetHigh()    do { LATB2 = 1; } while(0)
-#define IO_RB2_SetLow()   do { LATB2 = 0; } while(0)
-#define IO_RB2_Toggle()   do { LATB2 = ~LATB2; } while(0)
-#define IO_RB2_GetValue()         RB2
-#define IO_RB2_SetDigitalInput()    do { TRISB2 = 1; } while(0)
-#define IO_RB2_SetDigitalOutput()   do { TRISB2 = 0; } while(0)
-
-#define IO_RB2_SetPullup()    do { WPUB2 = 1; } while(0)
-#define IO_RB2_ResetPullup()   do { WPUB2 = 0; } while(0)
-#define IO_RB2_SetAnalogMode()   do { ANS8 = 1; } while(0)
-#define IO_RB2_SetDigitalMode()   do { ANS8 = 0; } while(0)
+#define BT_CONN_SetPullup()    do { WPUB0 = 1; } while(0)
+#define BT_CONN_ResetPullup()   do { WPUB0 = 0; } while(0)
+#define BT_CONN_SetAnalogMode()   do { ANS12 = 1; } while(0)
+#define BT_CONN_SetDigitalMode()   do { ANS12 = 0; } while(0)
 
 
-// get/set IO_RB3 aliases
-#define IO_RB3_TRIS               TRISB3
-#define IO_RB3_LAT                LATB3
-#define IO_RB3_PORT               RB3
-#define IO_RB3_WPU                WPUB3
-#define IO_RB3_ANS                ANS9
-#define IO_RB3_SetHigh()    do { LATB3 = 1; } while(0)
-#define IO_RB3_SetLow()   do { LATB3 = 0; } while(0)
-#define IO_RB3_Toggle()   do { LATB3 = ~LATB3; } while(0)
-#define IO_RB3_GetValue()         RB3
-#define IO_RB3_SetDigitalInput()    do { TRISB3 = 1; } while(0)
-#define IO_RB3_SetDigitalOutput()   do { TRISB3 = 0; } while(0)
+// get/set SENS_DETECT aliases
+#define SENS_DETECT_TRIS               TRISB1
+#define SENS_DETECT_LAT                LATB1
+#define SENS_DETECT_PORT               RB1
+#define SENS_DETECT_WPU                WPUB1
+#define SENS_DETECT_ANS                ANS10
+#define SENS_DETECT_SetHigh()    do { LATB1 = 1; } while(0)
+#define SENS_DETECT_SetLow()   do { LATB1 = 0; } while(0)
+#define SENS_DETECT_Toggle()   do { LATB1 = ~LATB1; } while(0)
+#define SENS_DETECT_GetValue()         PORTBbits.RB1
+#define SENS_DETECT_SetDigitalInput()    do { TRISB1 = 1; } while(0)
+#define SENS_DETECT_SetDigitalOutput()   do { TRISB1 = 0; } while(0)
 
-#define IO_RB3_SetPullup()    do { WPUB3 = 1; } while(0)
-#define IO_RB3_ResetPullup()   do { WPUB3 = 0; } while(0)
-#define IO_RB3_SetAnalogMode()   do { ANS9 = 1; } while(0)
-#define IO_RB3_SetDigitalMode()   do { ANS9 = 0; } while(0)
+#define SENS_DETECT_SetPullup()    do { WPUB1 = 1; } while(0)
+#define SENS_DETECT_ResetPullup()   do { WPUB1 = 0; } while(0)
+#define SENS_DETECT_SetAnalogMode()   do { ANS10 = 1; } while(0)
+#define SENS_DETECT_SetDigitalMode()   do { ANS10 = 0; } while(0)
 
 
-// get/set IO_RB4 aliases
-#define IO_RB4_TRIS               TRISB4
-#define IO_RB4_LAT                LATB4
-#define IO_RB4_PORT               RB4
-#define IO_RB4_WPU                WPUB4
-#define IO_RB4_ANS                ANS11
-#define IO_RB4_SetHigh()    do { LATB4 = 1; } while(0)
-#define IO_RB4_SetLow()   do { LATB4 = 0; } while(0)
-#define IO_RB4_Toggle()   do { LATB4 = ~LATB4; } while(0)
-#define IO_RB4_GetValue()         RB4
-#define IO_RB4_SetDigitalInput()    do { TRISB4 = 1; } while(0)
-#define IO_RB4_SetDigitalOutput()   do { TRISB4 = 0; } while(0)
+// get/set EN_BT aliases
+#define EN_BT_TRIS               TRISB2
+#define EN_BT_LAT                LATB2
+#define EN_BT_PORT               RB2
+#define EN_BT_WPU                WPUB2
+#define EN_BT_ANS                ANS8
+#define EN_BT_SetHigh()    do { LATB2 = 1; } while(0)
+#define EN_BT_SetLow()   do { LATB2 = 0; } while(0)
+#define EN_BT_Toggle()   do { LATB2 = ~LATB2; } while(0)
+#define EN_BT_GetValue()         PORTBbits.RB2
+#define EN_BT_SetDigitalInput()    do { TRISB2 = 1; } while(0)
+#define EN_BT_SetDigitalOutput()   do { TRISB2 = 0; } while(0)
 
-#define IO_RB4_SetPullup()    do { WPUB4 = 1; } while(0)
-#define IO_RB4_ResetPullup()   do { WPUB4 = 0; } while(0)
-#define IO_RB4_SetAnalogMode()   do { ANS11 = 1; } while(0)
-#define IO_RB4_SetDigitalMode()   do { ANS11 = 0; } while(0)
+#define EN_BT_SetPullup()    do { WPUB2 = 1; } while(0)
+#define EN_BT_ResetPullup()   do { WPUB2 = 0; } while(0)
+#define EN_BT_SetAnalogMode()   do { ANS8 = 1; } while(0)
+#define EN_BT_SetDigitalMode()   do { ANS8 = 0; } while(0)
+
+
+// get/set BT_CMD aliases
+#define BT_CMD_TRIS               TRISB3
+#define BT_CMD_LAT                LATB3
+#define BT_CMD_PORT               RB3
+#define BT_CMD_WPU                WPUB3
+#define BT_CMD_ANS                ANS9
+#define BT_CMD_SetHigh()    do { LATB3 = 1; } while(0)
+#define BT_CMD_SetLow()   do { LATB3 = 0; } while(0)
+#define BT_CMD_Toggle()   do { LATB3 = ~LATB3; } while(0)
+#define BT_CMD_GetValue()         PORTBbits.RB3
+#define BT_CMD_SetDigitalInput()    do { TRISB3 = 1; } while(0)
+#define BT_CMD_SetDigitalOutput()   do { TRISB3 = 0; } while(0)
+
+#define BT_CMD_SetPullup()    do { WPUB3 = 1; } while(0)
+#define BT_CMD_ResetPullup()   do { WPUB3 = 0; } while(0)
+#define BT_CMD_SetAnalogMode()   do { ANS9 = 1; } while(0)
+#define BT_CMD_SetDigitalMode()   do { ANS9 = 0; } while(0)
+
+
+// get/set BT_WAKE aliases
+#define BT_WAKE_TRIS               TRISB4
+#define BT_WAKE_LAT                LATB4
+#define BT_WAKE_PORT               RB4
+#define BT_WAKE_WPU                WPUB4
+#define BT_WAKE_ANS                ANS11
+#define BT_WAKE_SetHigh()    do { LATB4 = 1; } while(0)
+#define BT_WAKE_SetLow()   do { LATB4 = 0; } while(0)
+#define BT_WAKE_Toggle()   do { LATB4 = ~LATB4; } while(0)
+#define BT_WAKE_GetValue()         PORTBbits.RB4
+#define BT_WAKE_SetDigitalInput()    do { TRISB4 = 1; } while(0)
+#define BT_WAKE_SetDigitalOutput()   do { TRISB4 = 0; } while(0)
+
+#define BT_WAKE_SetPullup()    do { WPUB4 = 1; } while(0)
+#define BT_WAKE_ResetPullup()   do { WPUB4 = 0; } while(0)
+#define BT_WAKE_SetAnalogMode()   do { ANS11 = 1; } while(0)
+#define BT_WAKE_SetDigitalMode()   do { ANS11 = 0; } while(0)
 
 
 // get/set IO_RB5 aliases
@@ -255,7 +255,7 @@
 #define IO_RB5_SetHigh()    do { LATB5 = 1; } while(0)
 #define IO_RB5_SetLow()   do { LATB5 = 0; } while(0)
 #define IO_RB5_Toggle()   do { LATB5 = ~LATB5; } while(0)
-#define IO_RB5_GetValue()         RB5
+#define IO_RB5_GetValue()         PORTBbits.RB5
 #define IO_RB5_SetDigitalInput()    do { TRISB5 = 1; } while(0)
 #define IO_RB5_SetDigitalOutput()   do { TRISB5 = 0; } while(0)
 
@@ -263,81 +263,107 @@
 #define IO_RB5_ResetPullup()   do { WPUB5 = 0; } while(0)
 
 
-// get/set IO_RC0 aliases
-#define IO_RC0_TRIS               TRISC0
-#define IO_RC0_LAT                LATC0
-#define IO_RC0_PORT               RC0
-#define IO_RC0_SetHigh()    do { LATC0 = 1; } while(0)
-#define IO_RC0_SetLow()   do { LATC0 = 0; } while(0)
-#define IO_RC0_Toggle()   do { LATC0 = ~LATC0; } while(0)
-#define IO_RC0_GetValue()         RC0
-#define IO_RC0_SetDigitalInput()    do { TRISC0 = 1; } while(0)
-#define IO_RC0_SetDigitalOutput()   do { TRISC0 = 0; } while(0)
+// get/set CONN_TEST_6 aliases
+#define CONN_TEST_6_TRIS               TRISC0
+#define CONN_TEST_6_LAT                LATC0
+#define CONN_TEST_6_PORT               RC0
+#define CONN_TEST_6_SetHigh()    do { LATC0 = 1; } while(0)
+#define CONN_TEST_6_SetLow()   do { LATC0 = 0; } while(0)
+#define CONN_TEST_6_Toggle()   do { LATC0 = ~LATC0; } while(0)
+#define CONN_TEST_6_GetValue()         PORTCbits.RC0
+#define CONN_TEST_6_SetDigitalInput()    do { TRISC0 = 1; } while(0)
+#define CONN_TEST_6_SetDigitalOutput()   do { TRISC0 = 0; } while(0)
 
 
 
-// get/set IO_RC1 aliases
-#define IO_RC1_TRIS               TRISC1
-#define IO_RC1_LAT                LATC1
-#define IO_RC1_PORT               RC1
-#define IO_RC1_SetHigh()    do { LATC1 = 1; } while(0)
-#define IO_RC1_SetLow()   do { LATC1 = 0; } while(0)
-#define IO_RC1_Toggle()   do { LATC1 = ~LATC1; } while(0)
-#define IO_RC1_GetValue()         RC1
-#define IO_RC1_SetDigitalInput()    do { TRISC1 = 1; } while(0)
-#define IO_RC1_SetDigitalOutput()   do { TRISC1 = 0; } while(0)
+// get/set CONN_TEST_7 aliases
+#define CONN_TEST_7_TRIS               TRISC1
+#define CONN_TEST_7_LAT                LATC1
+#define CONN_TEST_7_PORT               RC1
+#define CONN_TEST_7_SetHigh()    do { LATC1 = 1; } while(0)
+#define CONN_TEST_7_SetLow()   do { LATC1 = 0; } while(0)
+#define CONN_TEST_7_Toggle()   do { LATC1 = ~LATC1; } while(0)
+#define CONN_TEST_7_GetValue()         PORTCbits.RC1
+#define CONN_TEST_7_SetDigitalInput()    do { TRISC1 = 1; } while(0)
+#define CONN_TEST_7_SetDigitalOutput()   do { TRISC1 = 0; } while(0)
 
 
 
-// get/set IO_RC2 aliases
-#define IO_RC2_TRIS               TRISC2
-#define IO_RC2_LAT                LATC2
-#define IO_RC2_PORT               RC2
-#define IO_RC2_SetHigh()    do { LATC2 = 1; } while(0)
-#define IO_RC2_SetLow()   do { LATC2 = 0; } while(0)
-#define IO_RC2_Toggle()   do { LATC2 = ~LATC2; } while(0)
-#define IO_RC2_GetValue()         RC2
-#define IO_RC2_SetDigitalInput()    do { TRISC2 = 1; } while(0)
-#define IO_RC2_SetDigitalOutput()   do { TRISC2 = 0; } while(0)
+// get/set CONN_TEST_8 aliases
+#define CONN_TEST_8_TRIS               TRISC2
+#define CONN_TEST_8_LAT                LATC2
+#define CONN_TEST_8_PORT               RC2
+#define CONN_TEST_8_SetHigh()    do { LATC2 = 1; } while(0)
+#define CONN_TEST_8_SetLow()   do { LATC2 = 0; } while(0)
+#define CONN_TEST_8_Toggle()   do { LATC2 = ~LATC2; } while(0)
+#define CONN_TEST_8_GetValue()         PORTCbits.RC2
+#define CONN_TEST_8_SetDigitalInput()    do { TRISC2 = 1; } while(0)
+#define CONN_TEST_8_SetDigitalOutput()   do { TRISC2 = 0; } while(0)
 
 
 
-// get/set IO_RC5 aliases
-#define IO_RC5_TRIS               TRISC5
-#define IO_RC5_LAT                LATC5
-#define IO_RC5_PORT               RC5
-#define IO_RC5_SetHigh()    do { LATC5 = 1; } while(0)
-#define IO_RC5_SetLow()   do { LATC5 = 0; } while(0)
-#define IO_RC5_Toggle()   do { LATC5 = ~LATC5; } while(0)
-#define IO_RC5_GetValue()         RC5
-#define IO_RC5_SetDigitalInput()    do { TRISC5 = 1; } while(0)
-#define IO_RC5_SetDigitalOutput()   do { TRISC5 = 0; } while(0)
+// get/set CONN_TEST_8 aliases
+#define CONN_TEST_8_TRIS               TRISC2
+#define CONN_TEST_8_LAT                LATC2
+#define CONN_TEST_8_PORT               RC2
+#define CONN_TEST_8_SetHigh()    do { LATC2 = 1; } while(0)
+#define CONN_TEST_8_SetLow()   do { LATC2 = 0; } while(0)
+#define CONN_TEST_8_Toggle()   do { LATC2 = ~LATC2; } while(0)
+#define CONN_TEST_8_GetValue()         PORTCbits.RC2
+#define CONN_TEST_8_SetDigitalInput()    do { TRISC2 = 1; } while(0)
+#define CONN_TEST_8_SetDigitalOutput()   do { TRISC2 = 0; } while(0)
 
 
 
-// get/set IO_RC5 aliases
-#define IO_RC5_TRIS               TRISC5
-#define IO_RC5_LAT                LATC5
-#define IO_RC5_PORT               RC5
-#define IO_RC5_SetHigh()    do { LATC5 = 1; } while(0)
-#define IO_RC5_SetLow()   do { LATC5 = 0; } while(0)
-#define IO_RC5_Toggle()   do { LATC5 = ~LATC5; } while(0)
-#define IO_RC5_GetValue()         RC5
-#define IO_RC5_SetDigitalInput()    do { TRISC5 = 1; } while(0)
-#define IO_RC5_SetDigitalOutput()   do { TRISC5 = 0; } while(0)
+// get/set CONN_TEST_8 aliases
+#define CONN_TEST_8_TRIS               TRISC2
+#define CONN_TEST_8_LAT                LATC2
+#define CONN_TEST_8_PORT               RC2
+#define CONN_TEST_8_SetHigh()    do { LATC2 = 1; } while(0)
+#define CONN_TEST_8_SetLow()   do { LATC2 = 0; } while(0)
+#define CONN_TEST_8_Toggle()   do { LATC2 = ~LATC2; } while(0)
+#define CONN_TEST_8_GetValue()         PORTCbits.RC2
+#define CONN_TEST_8_SetDigitalInput()    do { TRISC2 = 1; } while(0)
+#define CONN_TEST_8_SetDigitalOutput()   do { TRISC2 = 0; } while(0)
 
 
 
-// get/set IO_RC5 aliases
-#define IO_RC5_TRIS               TRISC5
-#define IO_RC5_LAT                LATC5
-#define IO_RC5_PORT               RC5
-#define IO_RC5_SetHigh()    do { LATC5 = 1; } while(0)
-#define IO_RC5_SetLow()   do { LATC5 = 0; } while(0)
-#define IO_RC5_Toggle()   do { LATC5 = ~LATC5; } while(0)
-#define IO_RC5_GetValue()         RC5
-#define IO_RC5_SetDigitalInput()    do { TRISC5 = 1; } while(0)
-#define IO_RC5_SetDigitalOutput()   do { TRISC5 = 0; } while(0)
+// get/set EN_ALIM aliases
+#define EN_ALIM_TRIS               TRISC5
+#define EN_ALIM_LAT                LATC5
+#define EN_ALIM_PORT               RC5
+#define EN_ALIM_SetHigh()    do { LATC5 = 1; } while(0)
+#define EN_ALIM_SetLow()   do { LATC5 = 0; } while(0)
+#define EN_ALIM_Toggle()   do { LATC5 = ~LATC5; } while(0)
+#define EN_ALIM_GetValue()         PORTCbits.RC5
+#define EN_ALIM_SetDigitalInput()    do { TRISC5 = 1; } while(0)
+#define EN_ALIM_SetDigitalOutput()   do { TRISC5 = 0; } while(0)
+
+
+
+// get/set EN_ALIM aliases
+#define EN_ALIM_TRIS               TRISC5
+#define EN_ALIM_LAT                LATC5
+#define EN_ALIM_PORT               RC5
+#define EN_ALIM_SetHigh()    do { LATC5 = 1; } while(0)
+#define EN_ALIM_SetLow()   do { LATC5 = 0; } while(0)
+#define EN_ALIM_Toggle()   do { LATC5 = ~LATC5; } while(0)
+#define EN_ALIM_GetValue()         PORTCbits.RC5
+#define EN_ALIM_SetDigitalInput()    do { TRISC5 = 1; } while(0)
+#define EN_ALIM_SetDigitalOutput()   do { TRISC5 = 0; } while(0)
+
+
+
+// get/set EN_ALIM aliases
+#define EN_ALIM_TRIS               TRISC5
+#define EN_ALIM_LAT                LATC5
+#define EN_ALIM_PORT               RC5
+#define EN_ALIM_SetHigh()    do { LATC5 = 1; } while(0)
+#define EN_ALIM_SetLow()   do { LATC5 = 0; } while(0)
+#define EN_ALIM_Toggle()   do { LATC5 = ~LATC5; } while(0)
+#define EN_ALIM_GetValue()         PORTCbits.RC5
+#define EN_ALIM_SetDigitalInput()    do { TRISC5 = 1; } while(0)
+#define EN_ALIM_SetDigitalOutput()   do { TRISC5 = 0; } while(0)
 
 
 
