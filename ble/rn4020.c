@@ -74,26 +74,26 @@ void RN4020_ManageRequest() {
 
         case REQUEST_NOT_PROCESSED:
             // Start I2C operation (need to change sync to async)
-            
+
             i2cTimeout = 0;
             i2cStatus = I2C_MESSAGE_PENDING;
 
             while (!I2C_MasterQueueIsEmpty());
-            
+
             switch (remoteRequest.data[0]) {
                 case REQUEST_READ:
                     I2C_MasterRead(remoteRequest.data + 2,
-                                    remoteRequest.data[1],
-                                    sensorState.addr,
-                                    &i2cStatus);
+                            remoteRequest.data[1],
+                            sensorState.addr,
+                            &i2cStatus);
                     remoteRequest.status = REQUEST_WORKING;
                     break;
-                    
+
                 case REQUEST_WRITE:
                     I2C_MasterWrite(remoteRequest.data + 2,
-                                    remoteRequest.data[1],
-                                    sensorState.addr,
-                                    &i2cStatus);                    
+                            remoteRequest.data[1],
+                            sensorState.addr,
+                            &i2cStatus);
                     remoteRequest.status = REQUEST_WORKING;
                     break;
                 default:
@@ -106,35 +106,40 @@ void RN4020_ManageRequest() {
             // wait for the message to be sent or status has changed.
             // Start timeout counter only when message started to send
             while (i2cStatus == I2C_MESSAGE_PENDING && sensorState.plugged);
-            
-            if(sensorState.plugged == false) {
+
+            if (sensorState.plugged == false) {
                 remoteRequest.status = REQUEST_FAIL;
                 break;
             }
-            
-            if(i2cStatus != I2C_MESSAGE_PENDING) {
-                if(i2cTimeout++ > I2C_RETRY_MAX)
+
+            if (i2cStatus != I2C_MESSAGE_PENDING) {
+                if (i2cTimeout++ > I2C_RETRY_MAX)
                     remoteRequest.status = REQUEST_FAIL;
                 else if (i2cStatus == I2C_MESSAGE_FAIL)
                     remoteRequest.status = REQUEST_FAIL;
-                else if(i2cStatus == I2C_MESSAGE_COMPLETE)
-                    remoteRequest.status = REQUEST_DONE;               
+                else if (i2cStatus == I2C_MESSAGE_COMPLETE)
+                    remoteRequest.status = REQUEST_DONE;
             }
             break;
 
         case REQUEST_DONE:
-            // Notify all went well
-            printf(RN4020_WRITE_CHAR, ANSWER_HANDLE);
-            printf("%02X", remoteRequest.data[0]);
-            printf("%02X", remoteRequest.data[1]);
+            if (RN4020_WakeModule()) {
+                // Notify all went well
+                printf(RN4020_WRITE_CHAR, ANSWER_HANDLE);
+                printf("%02X", remoteRequest.data[0]);
+                printf("%02X", remoteRequest.data[1]);
 
-            if (remoteRequest.data[0] == REQUEST_READ) {
-                for (i = 0; i < remoteRequest.data[1]; i++)
-                    printf("%02X", remoteRequest.data[i + 2]);
+                if (remoteRequest.data[0] == REQUEST_READ) {
+                    for (i = 0; i < remoteRequest.data[1]; i++)
+                        printf("%02X", remoteRequest.data[i + 2]);
+                }
+
+                RN4020_EXECCMD();
+                if (RN4020_WaitFor(RN4020_AOK)) {
+                    BT_WAKE_SetLow();
+                    remoteRequest.status = NO_REQUEST;
+                }
             }
-            RN4020_EXECCMD();
-            if(RN4020_WaitFor(RN4020_AOK))
-                remoteRequest.status = NO_REQUEST;
             break;
 
         case REQUEST_FAIL:
@@ -145,12 +150,16 @@ void RN4020_ManageRequest() {
 }
 
 void RN4020_NotifyPlug() {
-    printf(RN4020_WRITE_CHAR, CONNECTION_HANDLE);
-    printf("%02X", sensorState.plugged);
-    if (sensorState.plugged)
-        printf("%02X", sensorState.addr);
 
-    RN4020_EXECCMD();
+    if (RN4020_WakeModule()) {
+        printf(RN4020_WRITE_CHAR, CONNECTION_HANDLE);
+        printf("%02X", sensorState.plugged);
+        if (sensorState.plugged)
+            printf("%02X", sensorState.addr);
+        RN4020_EXECCMD();
+        RN4020_WaitFor(RN4020_AOK);
+        BT_WAKE_SetLow();
+    }
 }
 
 void RN4020_ClearInput() {
@@ -175,7 +184,7 @@ void RN4020_GetMessage() {
                 remoteRequest.length = 0;
 
                 do {
-                    remoteRequest.data[remoteRequest.length++] = (uint8_t)ASCIIToHex8(command);
+                    remoteRequest.data[remoteRequest.length++] = ASCIIToHex8(command);
                     command = command + 2;
                 }
                 while (*command != '.');

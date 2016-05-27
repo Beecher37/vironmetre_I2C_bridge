@@ -27,23 +27,33 @@ void main(void) {
 
     // On error, put an LED ON and block in this state
     if (!(RN4020_WakeModule() && RN4020_VerifyServices())) {
-        CONN_TEST_0_SetHigh();
+#ifdef __DEBUG    
+    CONN_TEST_0_SetHigh();
+#endif
         for (;;) {}
     }
     
     RN4020_AdvertisePresence();
-    BT_WAKE_SetLow();    
+    BT_WAKE_SetLow();
+#ifdef __DEBUG    
     CONN_TEST_0_SetLow();
-        
+#endif
     for (;;) {
         // Debounce bluetooth input state
         Debounce(BT_CONN_GetValue(), &bluetoothState.connected, &bluetoothState.debounceCount);
         
+        // Sub-state : connected
         if (bluetoothState.connected) {
-            RN4020_WakeModule();
+            // Connected for the first iteration
+            if(bluetoothState.connected != oldBluetoothState.connected) {
+                remoteRequest.status = NO_REQUEST;
+                //RN4020_WakeModule();
+            }
+                
             Debounce(!SENS_DETECT_GetValue(), &sensorState.plugged, &sensorState.debounceCount);
             
-            // Plug/deplug event
+            // <editor-fold defaultstate="collapsed" desc="Plug/deplug event">
+
             if (sensorState.plugged != oldSensorState.plugged) {
 #ifdef __DEBUG
                 CONN_TEST_0_SetHigh();
@@ -62,19 +72,21 @@ void main(void) {
 
                 RN4020_NotifyPlug();
                 remoteRequest.status = NO_REQUEST;
-            }
+            }            
+            
+            // </editor-fold>
             
             RN4020_ManageRequest(); // Process existing requests
-            RN4020_GetMessage(); // Read commands
+            RN4020_GetMessage(); // Read commands and create request
 
             oldSensorState = sensorState;
         }
         else
         {
+            // Not connected for the first iteration
             if(bluetoothState.connected != oldBluetoothState.connected)
                 RN4020_AdvertisePresence();
-            
-            BT_WAKE_SetLow();
+            //BT_WAKE_SetLow();
         }
         
         oldBluetoothState = bluetoothState;
