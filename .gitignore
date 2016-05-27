@@ -221,3 +221,5 @@ pip-log.txt
 
 *.pdf
 
+nbproject/Makefile-genesis.properties
+nbproject/private/private.xml

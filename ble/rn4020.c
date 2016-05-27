@@ -14,10 +14,28 @@ I2C_MESSAGE_STATUS i2cStatus;
 RN4020status_t bluetoothState;
 RN4020status_t oldBluetoothState;
 
+static void reportError()
+{
+    CONN_TEST_0_SetHigh();
+    __delay_ms(50);
+    __delay_ms(50);
+    __delay_ms(50);
+    __delay_ms(50);
+    __delay_ms(50);
+    CONN_TEST_0_SetLow();
+    __delay_ms(50);
+    __delay_ms(50);
+    __delay_ms(50);
+    __delay_ms(50);
+    __delay_ms(50);
+}
+
 bool RN4020_WaitFor(const uint8_t* msg) {
     uint16_t timeout = UINT16_MAX;
 
-    while (timeout-- && commandsCount == 0);
+    while (timeout && (commandsCount == 0)) {
+        timeout--;
+    }
 
     if (timeout > 0)
         return (strcmp(EUSART_GetCommand(), msg) == 0);
@@ -35,32 +53,58 @@ bool RN4020_WakeModule() {
         return true;
 }
 
+void RN4020_SleepModule()
+{
+    if(BT_WAKE_GetValue()){
+        BT_WAKE_SetLow();
+        
+        if(!RN4020_WaitFor(RN4020_END)) {
+            reportError();
+        }
+    }
+}
+
 bool RN4020_VerifyServices() {
     RN4020_ClearInput();
     RN4020_ListServices();
 
     // Check that both services (battery, vironmetre) exist
     if (RN4020_WaitFor(VIRONMETRE_SERVICE_ID_STR) &&
-            RN4020_WaitFor(CONNECTION_VALUE_STR) &&
-            RN4020_WaitFor(CONNECTION_CHAR_STR) &&
-            RN4020_WaitFor(REQUEST_VALUE_STR) &&
-            RN4020_WaitFor(ANSWER_VALUE_STR) &&
-            RN4020_WaitFor(ANSWER_CHAR_STR) &&
-            RN4020_WaitFor(BATTERY_SERVICE_ID) &&
-            RN4020_WaitFor(BATTERY_VALUE_STR) &&
-            RN4020_WaitFor(BATTERY_CHAR_STR) &&
-            RN4020_WaitFor(RN4020_END)) {
+        RN4020_WaitFor(CONNECTION_VALUE_STR) &&
+        RN4020_WaitFor(CONNECTION_CHAR_STR) &&
+        RN4020_WaitFor(REQUEST_VALUE_STR) &&
+        RN4020_WaitFor(ANSWER_VALUE_STR) &&
+        RN4020_WaitFor(ANSWER_CHAR_STR) &&
+        RN4020_WaitFor(BATTERY_SERVICE_ID) &&
+        RN4020_WaitFor(BATTERY_VALUE_STR) &&
+        RN4020_WaitFor(BATTERY_CHAR_STR) &&
+        RN4020_WaitFor(RN4020_END)) {
         return true;
     }
     else {
+        reportError();
         RN4020_ClearInput();
         return false;
     }
 }
 
 bool RN4020_AdvertisePresence() {
-    printf("A,0600\r\n"); // Advertise only every 1536ms to keep avg current low
-    return RN4020_WaitFor(RN4020_AOK);
+    bool tmp = false;
+    
+    if(RN4020_WakeModule()) {
+        printf("A,0200\r\n"); // Advertise only every 1536ms to keep avg current low
+        tmp = RN4020_WaitFor(RN4020_AOK);
+    }
+    else {
+        reportError();
+    }
+    
+    if(!tmp)
+        reportError();
+    
+    RN4020_SleepModule();
+    
+    return tmp;
 }
 
 void RN4020_ManageRequest() {
@@ -136,14 +180,35 @@ void RN4020_ManageRequest() {
 
                 RN4020_EXECCMD();
                 if (RN4020_WaitFor(RN4020_AOK)) {
-                    BT_WAKE_SetLow();
-                    remoteRequest.status = NO_REQUEST;
+                    RN4020_SleepModule();
+                }
+                else {
+                    reportError();
                 }
             }
+            RN4020_SleepModule();
+            remoteRequest.status = NO_REQUEST;
             break;
 
         case REQUEST_FAIL:
             // TODO : Notify fail
+            if (RN4020_WakeModule()) {
+                // Notify all went well
+                printf(RN4020_WRITE_CHAR, ANSWER_HANDLE);
+                printf("%02X00", remoteRequest.data[0]);
+                RN4020_EXECCMD();
+                if (RN4020_WaitFor(RN4020_AOK)) {
+                    RN4020_SleepModule();
+                    remoteRequest.status = NO_REQUEST;
+                }
+                else
+                {
+                    reportError();
+                }
+            }
+            reportError();
+            RN4020_SleepModule();
+            RN4020_ClearInput();
             remoteRequest.status = NO_REQUEST;
             break;
     }
@@ -154,12 +219,20 @@ void RN4020_NotifyPlug() {
     if (RN4020_WakeModule()) {
         printf(RN4020_WRITE_CHAR, CONNECTION_HANDLE);
         printf("%02X", sensorState.plugged);
+        
         if (sensorState.plugged)
             printf("%02X", sensorState.addr);
+        
         RN4020_EXECCMD();
-        RN4020_WaitFor(RN4020_AOK);
-        BT_WAKE_SetLow();
+        if(!RN4020_WaitFor(RN4020_AOK)) {
+            reportError();
+        }
     }
+    else {
+        reportError();
+    }
+    
+    RN4020_SleepModule();
 }
 
 void RN4020_ClearInput() {
@@ -191,6 +264,10 @@ void RN4020_GetMessage() {
 
                 remoteRequest.status = REQUEST_NOT_PROCESSED;
             }
+        }
+        else if(startsWith(command, RN4020_REMOTE_SUSCRIBE))
+        {
+            reportError();
         }
     }
 }

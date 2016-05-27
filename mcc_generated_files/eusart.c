@@ -71,7 +71,7 @@ volatile uint8_t eusartTxBufferRemaining;
 //volatile uint8_t eusartRxCount;
 
 #define NB_COMMANDS             16
-#define COMMAND_MAX_SIZE        16
+#define COMMAND_MAX_SIZE        32
 
 static uint8_t commandsBufferHead = 0;
 static uint8_t commandsBufferTail = 0;
@@ -216,11 +216,10 @@ void EUSART_Receive_ISR(void)
     
     // on newline, move the command pointer
     if (RCREG == '\n')
-    {     
+    {   
+        commandsReceived[commandsBufferHead][commandPointer] = '\0';
         if(++commandsBufferHead >= NB_COMMANDS)
             commandsBufferHead = 0;
-        
-        commandsReceived[commandsBufferHead][commandPointer] = '\0';
         
         commandsCount++;
         commandPointer = 0;

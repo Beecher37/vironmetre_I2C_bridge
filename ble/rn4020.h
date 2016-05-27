@@ -93,6 +93,7 @@ extern remote_i2c_request_t remoteRequest;
 
 bool RN4020_WaitFor(const uint8_t* msg);
 bool RN4020_WakeModule();
+void RN4020_SleepModule();
 bool RN4020_VerifyServices();
 bool RN4020_AdvertisePresence();
 
