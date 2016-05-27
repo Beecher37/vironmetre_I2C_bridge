@@ -175,7 +175,7 @@ void RN4020_GetMessage() {
                 remoteRequest.length = 0;
 
                 do {
-                    remoteRequest.data[remoteRequest.length++] = ASCIIToHex8(command);
+                    remoteRequest.data[remoteRequest.length++] = (uint8_t)ASCIIToHex8(command);
                     command = command + 2;
                 }
                 while (*command != '.');

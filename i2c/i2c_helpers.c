@@ -6,19 +6,6 @@
 sensorStatus_t sensorState    = { false, 0x00, 0x0000 };
 sensorStatus_t oldSensorState = { false, 0x00, 0x0000 };
 
-void Debounce(bool rawPinValue, bool* oldStableValue, uint16_t* debounceCount) {
-    if (rawPinValue == *oldStableValue && *debounceCount > 0)
-        (*debounceCount)--;
-    else if (rawPinValue != *oldStableValue)
-        (*debounceCount)++;
-
-    // If the Input has shown the same value for long enough let's switch it
-    if (*debounceCount >= SENSOR_DEBOUNCE_COUNT) {
-        *debounceCount = 0;
-        *oldStableValue = rawPinValue;
-    }
-}
-
 bool I2C_Operation(uint8_t dev_addr, uint8_t* p_buffer, uint8_t length,
         void (*functionPtr)(uint8_t*,uint8_t,uint16_t, I2C_MESSAGE_STATUS*))
 {

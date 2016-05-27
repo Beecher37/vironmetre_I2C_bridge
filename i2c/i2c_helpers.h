@@ -17,20 +17,14 @@
 extern "C" {
 #endif 
 
-#define SENSOR_DEBOUNCE_COUNT   1000
-typedef struct
-{
+typedef struct {
     bool    plugged;
     uint8_t addr;
     uint16_t debounceCount;
 } sensorStatus_t;
 
-//const SensorStatus_t DEFAULT_SENSORSTATUS = { false, 0x00, 0x0000 };
-
 extern sensorStatus_t sensorState;
 extern sensorStatus_t oldSensorState;
-
-void Debounce(bool rawPinValue, bool* oldStableValue, uint16_t* debounceCount);
 
 bool I2C_Operation(uint8_t, uint8_t*, uint8_t,
     void (*)(uint8_t*,uint8_t,uint16_t, I2C_MESSAGE_STATUS*));

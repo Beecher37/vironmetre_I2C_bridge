@@ -2,6 +2,21 @@
 #include <stdio.h>
 #include <string.h>
 
+#define DEBOUNCE_COUNT   1000
+
+void Debounce(bool rawPinValue, bool* oldStableValue, uint16_t* debounceCount) {
+    if (rawPinValue == *oldStableValue && *debounceCount > 0)
+        (*debounceCount)--;
+    else if (rawPinValue != *oldStableValue)
+        (*debounceCount)++;
+
+    // If the Input has shown the same value for long enough let's switch it
+    if (*debounceCount >= DEBOUNCE_COUNT) {
+        *debounceCount = 0;
+        *oldStableValue = rawPinValue;
+    }
+}
+
 bool startsWith(const char *str, const char *pre) {
     return strncmp(pre, str, strlen(pre)) == 0;
 }

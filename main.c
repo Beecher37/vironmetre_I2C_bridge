@@ -30,13 +30,11 @@ void main(void) {
         CONN_TEST_0_SetHigh();
         for (;;) {}
     }
-    RN4020_AdvertisePresence();
-    BT_WAKE_SetLow();
-//    RN4020_WaitFor(RN4020_END);
     
+    RN4020_AdvertisePresence();
+    BT_WAKE_SetLow();    
     CONN_TEST_0_SetLow();
         
-    // Main loop
     for (;;) {
         // Debounce bluetooth input state
         Debounce(BT_CONN_GetValue(), &bluetoothState.connected, &bluetoothState.debounceCount);
@@ -77,8 +75,8 @@ void main(void) {
                 RN4020_AdvertisePresence();
             
             BT_WAKE_SetLow();
-            //RN4020_WaitFor(RN4020_END);
         }
+        
         oldBluetoothState = bluetoothState;
     }
 }

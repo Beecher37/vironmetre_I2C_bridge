@@ -16,6 +16,7 @@
 extern "C" {
 #endif /* __cplusplus */
 
+void Debounce(bool rawPinValue, bool* oldStableValue, uint16_t* debounceCount);
 bool startsWith(const char *str, const char *pre);
 uint16_t ASCIIToNibble(uint8_t nib);
 uint16_t ASCIIToHex16(uint8_t* hexStr);
