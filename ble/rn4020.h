@@ -1,7 +1,7 @@
 /* 
- * File:   
- * Author: 
- * Comments:
+ * File: rn4020.h
+ * Author: Thomas Prioul
+ * Comments: constants and helpers functions to interface with RN4020 module
  * Revision history: 
  */
 
@@ -9,15 +9,16 @@
 #define	RN4020_H
 
 #include <xc.h>
-#include "../mcc_generated_files/eusart.h"
+#include <stdint.h>
+#include <stdbool.h>
 
 #ifdef	__cplusplus
 extern "C" {
 #endif /* __cplusplus */
 
-////////////////////////////////////////////////////////////////////////////////
-// Common RN4020 commands and strings  
-////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////
+    // Common RN4020 commands and strings  
+    ////////////////////////////////////////////////////////////////////////////////
 #define RN4020_NEWLINE                  "\r\n"
 #define RN4020_CMD                      "CMD"
 #define RN4020_END                      "END"
@@ -26,75 +27,79 @@ extern "C" {
 #define RN4020_CONN_END                 "Connection End"
 #define RN4020_CONN_PARAM               "ConnParam:"    
 
-////////////////////////////////////////////////////////////////////////////////
-// Services and characteristics
-////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////
+    // Services and characteristics
+    ////////////////////////////////////////////////////////////////////////////////
 
 #define RN4020_WRITE_CHAR               "SHW,%04X,"
 #define RN4020_READ_CHAR                "SHR,%04X"
-    
-// Battery service
+#define RN4020_REMOTE_SUSCRIBE          "WC"
+#define RN4020_REMOTE_VALUE_CHANGE      "WV"     
+
+    // Battery service
 #define BATTERY_SERVICE_ID              "180F"
 #define BATTERY_VALUE_ID                "2A19"
-    
+
 #define BATTERY_VALUE_STR               "2A19,0017,V"
 #define BATTERY_CHAR_STR                "2A19,0018,C"
 
-// Private service
+    // Private service
 #define VIRONMETRE_SERVICE_ID_STR       "2000"
 #define CONNECTION_ID_STR               "3000"
-#define REQUEST_ID_STR                  "3001"
-#define ANSWER_ID_STR                   "3002"
-    
+#define CONNECTION_ID                   0x3000
+#define CONNECTION_HANDLE               0x000E
 #define CONNECTION_VALUE_STR            "3000,000E,V"    
 #define CONNECTION_CHAR_STR             "3000,000F,C" 
- 
+
+#define REQUEST_ID_STR                  "3001"
+#define REQUEST_ID                      0x3001
 #define REQUEST_VALUE_STR               "3001,0011,V"    
-    
+#define REQUEST_HANDLE                  0x0011
+
+#define ANSWER_ID_STR                   "3002"
+#define ANSWER_ID                       0x3002    
 #define ANSWER_VALUE_STR                "3002,0013,V"    
 #define ANSWER_CHAR_STR                 "3002,0014,C" 
-    
-#define CONNECTION_ID                   0x3000
-#define REQUEST_ID                      0x3001
-#define ANSWER_ID                       0x3002
+#define ANSWER_HANDLE                   0x0013       
 
-#define CONNECTION_HANDLE               0x000E
-#define REQUEST_HANDLE                  0x0011
-#define ANSWER_HANDLE                   0x0013    
-    
-#define RN4020_REMOTE_WR_CHAR           "WC"
-#define RN4020_REMOTE_WR_VAL            "WV"    
-    
+typedef struct {
+    bool connected;
+    uint16_t debounceCount;
+} RN4020status_t;
 
-        
-    
-typedef struct
-{
-    bool            doWork;
-    uint8_t         length;
-    uint8_t         data[20];
-} remote_req_t;
+typedef enum {
+    NO_REQUEST,
+    REQUEST_NOT_PROCESSED,
+    REQUEST_WORKING,
+    REQUEST_DONE,
+    REQUEST_FAIL
+} REMOTE_REQUEST_STATUS;
 
-extern remote_req_t request;
+typedef struct {
+    REMOTE_REQUEST_STATUS status;
+    uint8_t length;
+    uint8_t data[20];
+} remote_i2c_request_t;
 
-#define RN4020_ListServices()           printf("LS\r\n")
+extern RN4020status_t bluetoothState;
+extern RN4020status_t oldBluetoothState;
+extern remote_i2c_request_t remoteRequest;
+
+#define REQUEST_READ                    0x01
+#define REQUEST_WRITE                   0x00
+
+#define RN4020_ListServices()           puts("LS\r\n")
 #define RN4020_EXECCMD()                puts(RN4020_NEWLINE)
 
+bool RN4020_WaitFor(const uint8_t* msg);
+bool RN4020_WakeModule();
+bool RN4020_VerifyServices();
+bool RN4020_AdvertisePresence();
+
+void RN4020_ManageRequest();
 void RN4020_NotifyPlug();
-void RN4020_AnswerRequest();
-
-void RN4020_WriteCharacteristicByte(uint16_t handle, uint8_t v);
-void RN4020_WriteCharacteristicWord(uint16_t handle, uint16_t v);
-void RN4020_WriteCharacteristicBuffer(uint16_t handle, uint8_t* buf, uint8_t len);
-
-bool RN4020_Init();
+void RN4020_GetMessage();
 void RN4020_ClearInput();
-
-// Helpers
-bool startsWith(const char *str, const char *pre);
-uint16_t ASCIIToNibble(uint8_t nib);
-uint16_t ASCIIToHex16(uint8_t* hexStr);
-uint16_t ASCIIToHex8(uint8_t* hexStr);
 
 #ifdef	__cplusplus
 }

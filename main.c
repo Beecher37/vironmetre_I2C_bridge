@@ -1,113 +1,85 @@
 #include "mcc_generated_files/mcc.h"
 #include "i2c/i2c_helpers.h"
 #include "ble/rn4020.h"
+#include "helpers/helpers.h"
+
+//#define __DEBUG
+
+void waitForRN4020Init()
+{
+    uint8_t i = 0;
+    for(;i < 200; i++)
+        __delay_ms(10);
+}
 
 void main(void) {
-    uint8_t i = 0;
-    SensorStatus_t oldSensorState = DEFAULT_SENSORSTATUS;
-    //    uint8_t opBuffer[20] = {0};
-    //    uint8_t opLength = 0;
-    uint8_t* command = NULL;
-    uint16_t receivedHandle = 0;
-
     SYSTEM_Initialize();
     INTERRUPT_GlobalInterruptEnable();
     INTERRUPT_PeripheralInterruptEnable();
     CONN_TEST_1_SetLow();
-    CONN_TEST_0_SetHigh();
     EN_ALIM_SetLow();
-    BT_WAKE_SetHigh();
+    
+    waitForRN4020Init();
+    
+#ifdef __DEBUG
+    CONN_TEST_0_SetHigh();
+#endif
 
-    for (i = 0; i < 60; i++) {
-        __delay_ms(50);
-    }
-
-    if (RN4020_Init()) {
-        CONN_TEST_0_SetLow();
-        BT_WAKE_SetLow();
-
-        for (;;) {
-            if (BT_CONN_GetValue()) {
-                if (!BT_WAKE_GetValue()) {
-                    BT_WAKE_SetHigh();
-                    __delay_ms(50);
-                }
-
-                // Read I/O, read serialport     
-                Debounce(!SENS_DETECT_GetValue(), &sensorState.plugged, &sensorState.debounceCount);
-                
-                // Plug/deplug event
-                if (sensorState.plugged != oldSensorState.plugged) {
-                    //opLength = 0;
-                    // opBuffer[opLength++] = sensorState.plugged;
-                    CONN_TEST_0_SetHigh();
-                    __delay_ms(50);
-                    __delay_ms(50);
-                    __delay_ms(50);
-                    __delay_ms(50);
-                    CONN_TEST_0_SetLow();
-
-                    // On plug, reset I2C and send address
-                    if (sensorState.plugged) {
-                        I2C_Initialize();
-                        __delay_ms(5);
-                        sensorState.addr = I2C_FirstDevice();
-                    }
-
-                    RN4020_NotifyPlug();
-                    request.doWork = false;
-                }
-
-                // Do requests
-                if (request.doWork) {
-                    if (request.data[0] == 0x01) {
-                        if (I2C_ReadBytes(sensorState.addr, request.data + 2, request.data[1])) {
-                            RN4020_AnswerRequest();
-                        }
-                    }
-                    else {
-                        if (I2C_WriteBytes(sensorState.addr, request.data + 2, request.data[1])) {
-                            RN4020_AnswerRequest();
-                        }
-                    }
-                }
-
-                // Read commands
-                if (commandsCount > 0) {
-                    command = EUSART_GetCommand();
-
-                    // Handle request
-                    if (startsWith(command, RN4020_REMOTE_WR_VAL)) {
-                        command = command + 3;
-                        receivedHandle = ASCIIToHex16(command);
-
-                        if (receivedHandle == REQUEST_HANDLE) {
-                            command = command + 5;
-                            request.length = 0;
-                            
-                            do {
-                                request.data[request.length++] = ASCIIToHex8(command);
-                                command = command + 2;
-                            }
-                            while (*command != '.');
-
-                            // Process command bytes
-                            request.doWork = true;
-
-                        }
-                    }
-                }
-                
-                oldSensorState = sensorState;
-            }
-            else
-                BT_WAKE_SetLow();
-        }
-    }
-    else {
+    // On error, put an LED ON and block in this state
+    if (!(RN4020_WakeModule() && RN4020_VerifyServices())) {
         CONN_TEST_0_SetHigh();
-        for (;;) {
+        for (;;) {}
+    }
+    RN4020_AdvertisePresence();
+    BT_WAKE_SetLow();
+//    RN4020_WaitFor(RN4020_END);
+    
+    CONN_TEST_0_SetLow();
+        
+    // Main loop
+    for (;;) {
+        // Debounce bluetooth input state
+        Debounce(BT_CONN_GetValue(), &bluetoothState.connected, &bluetoothState.debounceCount);
+        
+        if (bluetoothState.connected) {
+            RN4020_WakeModule();
+            Debounce(!SENS_DETECT_GetValue(), &sensorState.plugged, &sensorState.debounceCount);
+            
+            // Plug/deplug event
+            if (sensorState.plugged != oldSensorState.plugged) {
+#ifdef __DEBUG
+                CONN_TEST_0_SetHigh();
+                __delay_ms(50);
+                __delay_ms(50);
+                __delay_ms(50);
+                __delay_ms(50);
+                CONN_TEST_0_SetLow();
+#endif
+                // On plug, reset I2C and send address
+                if (sensorState.plugged) {
+                    I2C_Initialize();
+                    __delay_ms(5);
+                    sensorState.addr = I2C_FirstDevice();
+                }
+
+                RN4020_NotifyPlug();
+                remoteRequest.status = NO_REQUEST;
+            }
+            
+            RN4020_ManageRequest(); // Process existing requests
+            RN4020_GetMessage(); // Read commands
+
+            oldSensorState = sensorState;
         }
+        else
+        {
+            if(bluetoothState.connected != oldBluetoothState.connected)
+                RN4020_AdvertisePresence();
+            
+            BT_WAKE_SetLow();
+            //RN4020_WaitFor(RN4020_END);
+        }
+        oldBluetoothState = bluetoothState;
     }
 }
 

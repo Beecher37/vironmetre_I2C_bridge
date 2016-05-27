@@ -7,6 +7,9 @@
       <logicalFolder name="f2" displayName="BLE" projectFiles="true">
         <itemPath>ble/rn4020.h</itemPath>
       </logicalFolder>
+      <logicalFolder name="f3" displayName="Helpers" projectFiles="true">
+        <itemPath>helpers/helpers.h</itemPath>
+      </logicalFolder>
       <logicalFolder name="f1" displayName="I2C" projectFiles="true">
         <itemPath>i2c/i2c_helpers.h</itemPath>
       </logicalFolder>
@@ -29,6 +32,9 @@
                    projectFiles="true">
       <logicalFolder name="f2" displayName="BLE" projectFiles="true">
         <itemPath>ble/rn4020.c</itemPath>
+      </logicalFolder>
+      <logicalFolder name="f3" displayName="Helpers" projectFiles="true">
+        <itemPath>helpers/helpers.c</itemPath>
       </logicalFolder>
       <logicalFolder name="f1" displayName="I2C" projectFiles="true">
         <itemPath>i2c/i2c_helpers.c</itemPath>
@@ -53,6 +59,7 @@
   </logicalFolder>
   <sourceRootList>
     <Elem>i2c</Elem>
+    <Elem>helpers</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
@@ -76,7 +83,7 @@
         </archiverTool>
         <loading>
           <useAlternateLoadableFile>false</useAlternateLoadableFile>
-          <parseOnProdLoad>false</parseOnProdLoad>
+          <parseOnProdLoad>true</parseOnProdLoad>
           <alternateLoadableFile></alternateLoadableFile>
         </loading>
       </compileType>
@@ -105,7 +112,6 @@
         <property key="optimization-level" value="9"/>
         <property key="optimization-set" value="default"/>
         <property key="optimization-speed" value="false"/>
-        <property key="optimization-stable-enable" value="false"/>
         <property key="preprocess-assembler" value="true"/>
         <property key="undefine-macros" value=""/>
         <property key="use-cci" value="false"/>

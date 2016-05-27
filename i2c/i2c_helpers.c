@@ -3,7 +3,8 @@
 
 #define I2C_RETRY_MAX 5
 
-SensorStatus_t sensorState = { false, 0x00, 0x0000 };
+sensorStatus_t sensorState    = { false, 0x00, 0x0000 };
+sensorStatus_t oldSensorState = { false, 0x00, 0x0000 };
 
 void Debounce(bool rawPinValue, bool* oldStableValue, uint16_t* debounceCount) {
     if (rawPinValue == *oldStableValue && *debounceCount > 0)

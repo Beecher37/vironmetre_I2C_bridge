@@ -23,11 +23,12 @@ typedef struct
     bool    plugged;
     uint8_t addr;
     uint16_t debounceCount;
-} SensorStatus_t;
+} sensorStatus_t;
 
-const SensorStatus_t DEFAULT_SENSORSTATUS = { false, 0x00, 0x0000 };
+//const SensorStatus_t DEFAULT_SENSORSTATUS = { false, 0x00, 0x0000 };
 
-extern SensorStatus_t sensorState;
+extern sensorStatus_t sensorState;
+extern sensorStatus_t oldSensorState;
 
 void Debounce(bool rawPinValue, bool* oldStableValue, uint16_t* debounceCount);
 

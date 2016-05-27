@@ -1,99 +1,156 @@
 #include "rn4020.h"
 #include "../mcc_generated_files/mcc.h"
 #include "../i2c/i2c_helpers.h"
+#include "../helpers/helpers.h"
 #include <string.h>
 
-remote_req_t request;
+#define I2C_RETRY_MAX 5
 
-void RN4020_NotifyPlug()
-{
-    printf(RN4020_WRITE_CHAR, CONNECTION_HANDLE);
-    
-    printf("%02X", sensorState.plugged);
-    if(sensorState.plugged)
-        printf("%02X", sensorState.addr);
+remote_i2c_request_t remoteRequest;
 
-    RN4020_EXECCMD();
+uint8_t i2cTimeout;
+I2C_MESSAGE_STATUS i2cStatus;
+
+RN4020status_t bluetoothState;
+RN4020status_t oldBluetoothState;
+
+bool RN4020_WaitFor(const uint8_t* msg) {
+    uint16_t timeout = UINT16_MAX;
+
+    while (timeout-- && commandsCount == 0);
+
+    if (timeout > 0)
+        return (strcmp(EUSART_GetCommand(), msg) == 0);
+    else
+        return false;
 }
 
-void RN4020_AnswerRequest()
-{
-    uint8_t i = 0;
- 
-    request.doWork = false;
-    printf(RN4020_WRITE_CHAR, ANSWER_HANDLE);
-    
-    printf("%02X", request.data[0]);
-    printf("%02X", request.data[1]);
-    
-    if(request.data[0] == 1)
-    {
-        for(i = 0; i < request.data[1]; i++)
-            printf("%02X", request.data[i+2]);
+bool RN4020_WakeModule() {
+    if (!BT_WAKE_GetValue()) {
+        RN4020_ClearInput();
+        BT_WAKE_SetHigh();
+        return RN4020_WaitFor(RN4020_CMD);
     }
-    RN4020_EXECCMD();    
+    else
+        return true;
 }
 
-void RN4020_WriteCharacteristicByte(uint16_t UUID, uint8_t value) {
-    RN4020_WriteCharacteristicBuffer(UUID, &value, 1);
-}
-
-void RN4020_WriteCharacteristicWord(uint16_t UUID, uint16_t value) {
-    uint8_t buffer[2];
-    buffer[0] = LOW_BYTE(value);
-    buffer[1] = HIGH_BYTE(value);
-
-    RN4020_WriteCharacteristicBuffer(UUID, buffer, 2);
-}
-
-void RN4020_WriteCharacteristicBuffer(uint16_t UUID, uint8_t* buffer, uint8_t length) {
-    uint8_t i = 0;
-    printf(RN4020_WRITE_CHAR, UUID);
-    for (i = 0; i < length; i++)
-        printf("%02X", buffer[i]);
-    RN4020_EXECCMD();
-}
-
-bool RN4020_Init() {
-    uint8_t i = 0;
-
+bool RN4020_VerifyServices() {
     RN4020_ClearInput();
     RN4020_ListServices();
 
-    i += (strcmp(EUSART_GetCommand(), VIRONMETRE_SERVICE_ID_STR) == 0);
-        i += (strcmp(EUSART_GetCommand(), CONNECTION_VALUE_STR) == 0);
-        i += (strcmp(EUSART_GetCommand(), CONNECTION_CHAR_STR) == 0);
-        i += (strcmp(EUSART_GetCommand(), REQUEST_VALUE_STR) == 0);
-        i += (strcmp(EUSART_GetCommand(), ANSWER_VALUE_STR) == 0);
-        i += (strcmp(EUSART_GetCommand(), ANSWER_CHAR_STR) == 0);
-    
-    i += (strcmp(EUSART_GetCommand(), BATTERY_SERVICE_ID) == 0);
-        i += (strcmp(EUSART_GetCommand(), BATTERY_VALUE_STR) == 0);
-        i += (strcmp(EUSART_GetCommand(), BATTERY_CHAR_STR) == 0);
-        
-    i += (strcmp(EUSART_GetCommand(), RN4020_END) == 0);
-    
-    if (i >= 10)
-        return true;
-
-    return false;
-
-    /*
     // Check that both services (battery, vironmetre) exist
-    if (strcmp(EUSART_GetCommand(), VIRON_SERVICE_ID) == 0 &&
-        strcmp(EUSART_GetCommand(), "  3000,000E,V") == 0 &&
-        strcmp(EUSART_GetCommand(), "  3000,000F,C") == 0 &&
-        strcmp(EUSART_GetCommand(), BATTERY_SERVICE_ID) == 0 &&
-        strcmp(EUSART_GetCommand(), "  2A19,0012,V") == 0 &&
-        strcmp(EUSART_GetCommand(), "  2A19,0013,C") == 0 &&
-        strcmp(EUSART_GetCommand(), RN4020_END) == 0)
-        return true; 
-    else
-    {
-        RN4020_ClearInput();        
+    if (RN4020_WaitFor(VIRONMETRE_SERVICE_ID_STR) &&
+            RN4020_WaitFor(CONNECTION_VALUE_STR) &&
+            RN4020_WaitFor(CONNECTION_CHAR_STR) &&
+            RN4020_WaitFor(REQUEST_VALUE_STR) &&
+            RN4020_WaitFor(ANSWER_VALUE_STR) &&
+            RN4020_WaitFor(ANSWER_CHAR_STR) &&
+            RN4020_WaitFor(BATTERY_SERVICE_ID) &&
+            RN4020_WaitFor(BATTERY_VALUE_STR) &&
+            RN4020_WaitFor(BATTERY_CHAR_STR) &&
+            RN4020_WaitFor(RN4020_END)) {
+        return true;
+    }
+    else {
+        RN4020_ClearInput();
         return false;
     }
-     */
+}
+
+bool RN4020_AdvertisePresence() {
+    printf("A,0600\r\n"); // Advertise only every 1536ms to keep avg current low
+    return RN4020_WaitFor(RN4020_AOK);
+}
+
+void RN4020_ManageRequest() {
+    uint8_t i = 0;
+
+    switch (remoteRequest.status) {
+        default:
+        case NO_REQUEST:
+            // No request, do nothing
+            break;
+
+        case REQUEST_NOT_PROCESSED:
+            // Start I2C operation (need to change sync to async)
+            
+            i2cTimeout = 0;
+            i2cStatus = I2C_MESSAGE_PENDING;
+
+            while (!I2C_MasterQueueIsEmpty());
+            
+            switch (remoteRequest.data[0]) {
+                case REQUEST_READ:
+                    I2C_MasterRead(remoteRequest.data + 2,
+                                    remoteRequest.data[1],
+                                    sensorState.addr,
+                                    &i2cStatus);
+                    remoteRequest.status = REQUEST_WORKING;
+                    break;
+                    
+                case REQUEST_WRITE:
+                    I2C_MasterWrite(remoteRequest.data + 2,
+                                    remoteRequest.data[1],
+                                    sensorState.addr,
+                                    &i2cStatus);                    
+                    remoteRequest.status = REQUEST_WORKING;
+                    break;
+                default:
+                    break;
+            }
+            break;
+
+        case REQUEST_WORKING:
+            // Keep on working until the I2C request status changes  
+            // wait for the message to be sent or status has changed.
+            // Start timeout counter only when message started to send
+            while (i2cStatus == I2C_MESSAGE_PENDING && sensorState.plugged);
+            
+            if(sensorState.plugged == false) {
+                remoteRequest.status = REQUEST_FAIL;
+                break;
+            }
+            
+            if(i2cStatus != I2C_MESSAGE_PENDING) {
+                if(i2cTimeout++ > I2C_RETRY_MAX)
+                    remoteRequest.status = REQUEST_FAIL;
+                else if (i2cStatus == I2C_MESSAGE_FAIL)
+                    remoteRequest.status = REQUEST_FAIL;
+                else if(i2cStatus == I2C_MESSAGE_COMPLETE)
+                    remoteRequest.status = REQUEST_DONE;               
+            }
+            break;
+
+        case REQUEST_DONE:
+            // Notify all went well
+            printf(RN4020_WRITE_CHAR, ANSWER_HANDLE);
+            printf("%02X", remoteRequest.data[0]);
+            printf("%02X", remoteRequest.data[1]);
+
+            if (remoteRequest.data[0] == REQUEST_READ) {
+                for (i = 0; i < remoteRequest.data[1]; i++)
+                    printf("%02X", remoteRequest.data[i + 2]);
+            }
+            RN4020_EXECCMD();
+            if(RN4020_WaitFor(RN4020_AOK))
+                remoteRequest.status = NO_REQUEST;
+            break;
+
+        case REQUEST_FAIL:
+            // TODO : Notify fail
+            remoteRequest.status = NO_REQUEST;
+            break;
+    }
+}
+
+void RN4020_NotifyPlug() {
+    printf(RN4020_WRITE_CHAR, CONNECTION_HANDLE);
+    printf("%02X", sensorState.plugged);
+    if (sensorState.plugged)
+        printf("%02X", sensorState.addr);
+
+    RN4020_EXECCMD();
 }
 
 void RN4020_ClearInput() {
@@ -101,72 +158,30 @@ void RN4020_ClearInput() {
         EUSART_GetCommand();
 }
 
-bool startsWith(const char *str, const char *pre)
-{
-    return strncmp(pre, str, strlen(pre)) == 0;
-}
+void RN4020_GetMessage() {
+    uint8_t* command = NULL;
+    uint16_t receivedHandle = 0;
 
-uint16_t ASCIIToNibble(uint8_t nib)
-{
-    uint16_t n;
+    if (commandsCount > 0 && remoteRequest.status == NO_REQUEST) {
+        command = EUSART_GetCommand();
 
-    n = nib - '0';
-    if(n > 48)
-        n -= 39;
-    else if(n > 9)
-        n -= 7;
+        // Handle request
+        if (startsWith(command, RN4020_REMOTE_VALUE_CHANGE)) {
+            command = command + 3;
+            receivedHandle = ASCIIToHex16(command);
 
-    return n;
-}
+            if (receivedHandle == REQUEST_HANDLE) {
+                command = command + 5;
+                remoteRequest.length = 0;
 
-uint16_t ASCIIToHex16(uint8_t* hexStr)
-{
-    return ASCIIToNibble(*hexStr++) << 12 |
-           ASCIIToNibble(*hexStr++) << 8 |
-           ASCIIToNibble(*hexStr++) << 4 |
-           ASCIIToNibble(*hexStr);
-}
+                do {
+                    remoteRequest.data[remoteRequest.length++] = ASCIIToHex8(command);
+                    command = command + 2;
+                }
+                while (*command != '.');
 
-uint16_t ASCIIToHex8(uint8_t* hexStr)
-{
-    return (ASCIIToNibble(*hexStr++) << 4) | (ASCIIToNibble(*hexStr));
-}
-
-/*
-void RN4020_ParseCommand()
-{
-    
-}
-
-uint8_t RN4020_ReadLine(uint8_t* buffer, uint8_t maxLength)
-{
-    uint8_t i = 0;
-    
-    // Clear buffer
-    for(;i < maxLength; i++)
-        buffer[i] = '\0';
-    i = 0;
-        
-    // While EUSART isn't empty and still in max buffer size
-    while(EUSART_DataReady > 0 && i < maxLength)
-    {
-        // Read chars
-        buffer[i] = EUSART_Read();
-        
-        if(buffer[i] == '\n')
-        {
-            buffer[i] = '\0';
-            break;
+                remoteRequest.status = REQUEST_NOT_PROCESSED;
+            }
         }
-        i++;
     }
-    
-    if(i > 1 && buffer[i-1] == '\r')
-        buffer[i-1] = '\0';
-    
-    if(i > 0)
-        i++;
-    
-    return i;
 }
- */

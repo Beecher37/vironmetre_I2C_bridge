@@ -210,11 +210,11 @@ void EUSART_Receive_ISR(void)
     
     // buffer overruns are ignored
         
-    // ignore '\r' character
+    // ignore '\r' character and space character
     if(RCREG == '\r' || RCREG == 0x20)
         return;
     
-    // on newline, move buffer pointer
+    // on newline, move the command pointer
     if (RCREG == '\n')
     {     
         if(++commandsBufferHead >= NB_COMMANDS)
@@ -247,7 +247,6 @@ uint8_t* EUSART_GetCommand()
 {
     while(commandsCount == 0);
     
-   // uint8_t* buffer = commandsReceived[commandsBufferTail++];
     uint8_t* buf = commandsReceived[commandsBufferTail];
     
     if(++commandsBufferTail >= NB_COMMANDS)
